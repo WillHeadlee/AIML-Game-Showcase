@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Towers of Time — Sound Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #080508;
+      color: #e8d5b0;
+      font-family: 'Cinzel', serif;
+      min-height: 100vh;
+      padding: 32px 20px 60px;
+    }
+
+    h1 {
+      text-align: center;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 2rem;
+      color: #FFD700;
+      text-shadow: 0 0 40px rgba(255,120,0,0.55);
+      margin-bottom: 4px;
+      letter-spacing: 0.08em;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.6rem;
+      color: rgba(255,215,0,0.45);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      margin-bottom: 30px;
+    }
+
+    /* ── OSCILLOSCOPE ── */
+    .scope-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 8px; }
+    #scope {
+      width: 660px; max-width: 100%;
+      height: 110px;
+      background: rgba(0,18,4,0.92);
+      border: 1px solid rgba(0,255,80,0.2);
+      border-radius: 6px;
+      box-shadow: 0 0 24px rgba(0,255,80,0.06), inset 0 0 40px rgba(0,0,0,0.7);
+      display: block;
+    }
+    .scope-label {
+      font-size: 0.45rem;
+      color: rgba(0,255,80,0.35);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      margin: 5px 0 28px;
+    }
+    #nowPlaying {
+      font-size: 0.55rem;
+      color: rgba(255,215,0,0.6);
+      letter-spacing: 0.2em;
+      height: 14px;
+      margin-top: 4px;
+      text-transform: uppercase;
+      transition: opacity 0.3s ease;
+    }
+
+    /* ── SECTION LABELS ── */
+    .section { margin-bottom: 22px; }
+    .section-label {
+      text-align: center;
+      font-size: 0.55rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(255,215,0,0.5);
+      margin: 0 0 14px;
+      position: relative;
+    }
+    .section-label::before, .section-label::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      height: 1px;
+      width: 22%;
+      background: linear-gradient(to right, transparent, rgba(255,215,0,0.25));
+    }
+    .section-label::before { right: 56%; transform: scaleX(-1); }
+    .section-label::after  { left: 56%; }
+
+    .section-enemy .section-label {
+      color: rgba(255,80,80,0.5);
+    }
+    .section-enemy .section-label::before,
+    .section-enemy .section-label::after {
+      background: linear-gradient(to right, transparent, rgba(255,60,60,0.25));
+    }
+
+    /* ── CARD GRID ── */
+    .char-grid {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .char-card {
+      width: 148px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,200,100,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      user-select: none;
+    }
+    .char-card:hover {
+      border-color: rgba(255,150,0,0.38);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.55);
+    }
+    .char-card.playing {
+      border-color: rgba(255,180,0,0.65);
+      box-shadow: 0 0 22px rgba(255,120,0,0.28);
+    }
+    .section-enemy .char-card { border-color: rgba(200,50,50,0.12); }
+    .section-enemy .char-card:hover { border-color: rgba(255,60,60,0.4); }
+    .section-enemy .char-card.playing {
+      border-color: rgba(255,70,70,0.65);
+      box-shadow: 0 0 22px rgba(255,0,0,0.25);
+    }
+
+    /* Sprite frame */
+    .char-sprite {
+      width: 100%;
+      height: 112px;
+      object-fit: cover;
+      object-position: center 15%;
+      display: block;
+      filter: brightness(0.8) saturate(0.9);
+      transition: filter 0.2s ease;
+      background: rgba(0,0,0,0.4);
+    }
+    .char-card:hover .char-sprite,
+    .char-card.playing .char-sprite {
+      filter: brightness(1.0) saturate(1.1);
+    }
+
+    /* Info row */
+    .char-info { padding: 8px 10px 10px; }
+    .char-name {
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: rgba(255,220,160,0.88);
+      margin-bottom: 7px;
+    }
+    .section-enemy .char-name { color: rgba(255,170,170,0.88); }
+
+    .play-btn {
+      width: 100%;
+      padding: 5px 0;
+      background: rgba(160,70,0,0.18);
+      border: 1px solid rgba(255,120,0,0.22);
+      color: rgba(255,180,80,0.8);
+      font-family: 'Cinzel', serif;
+      font-size: 0.48rem;
+      letter-spacing: 0.18em;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .play-btn:hover {
+      background: rgba(200,80,0,0.32);
+      border-color: rgba(255,140,0,0.48);
+      color: #FFA040;
+    }
+    .play-btn:active { transform: scale(0.97); }
+
+    .section-enemy .play-btn {
+      background: rgba(100,0,0,0.18);
+      border-color: rgba(200,40,40,0.22);
+      color: rgba(255,140,140,0.8);
+    }
+    .section-enemy .play-btn:hover {
+      background: rgba(160,0,0,0.32);
+      border-color: rgba(255,60,60,0.48);
+      color: #FF6060;
+    }
+
+    /* Corner tags */
+    .era-tag {
+      position: absolute;
+      top: 6px; left: 6px;
+      font-size: 0.4rem;
+      letter-spacing: 0.1em;
+      color: rgba(255,215,0,0.55);
+      background: rgba(0,0,0,0.55);
+      padding: 2px 5px;
+      border-radius: 2px;
+      text-transform: uppercase;
+    }
+    .section-enemy .era-tag { color: rgba(255,100,100,0.55); }
+
+    .playing-pip {
+      position: absolute;
+      top: 7px; right: 7px;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #FFD700;
+      box-shadow: 0 0 8px #FFD700;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .char-card.playing .playing-pip { opacity: 1; animation: pip 0.5s ease infinite alternate; }
+    .section-enemy .char-card.playing .playing-pip { background: #FF5555; box-shadow: 0 0 8px #FF5555; }
+
+    @keyframes pip { from { opacity: 0.5; } to { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+<h1>Towers of Time</h1>
+<div class="subtitle">Sound Library · Character Demo</div>
+
+<!-- Oscilloscope -->
+<div class="scope-wrap">
+  <canvas id="scope" width="660" height="110"></canvas>
+  <div id="nowPlaying"></div>
+  <div class="scope-label">&#9632; live waveform monitor &#9632;</div>
+</div>
+
+<!-- Era I — Characters -->
+<div class="section section-char">
+  <div class="section-label">Era I — Prehistoric &nbsp;·&nbsp; Characters</div>
+  <div class="char-grid">
+
+    <div class="char-card" data-sfx="club"
+         data-sprite-base="assets/Club Man/club-man-attacking/" data-sprite-fmt="4d" data-sprite-ext="jpg" data-sprite-count="145"
+         data-label="Club Man">
+      <span class="era-tag">Era I</span>
+      <div class="playing-pip"></div>
+      <img class="char-sprite" src="assets/Club Man/club-man-attacking/0001.jpg" alt="Club Man">
+      <div class="char-info">
+        <div class="char-name">Club Man</div>
+        <button class="play-btn">&#9654; Play Sound</button>
+      </div>
+    </div>
+
+    <div class="char-card" data-sfx="rockThrower"
+         data-sprite-base="assets/Stone Man/stone-man-attacking/" data-sprite-fmt="4d" data-sprite-ext="jpg" data-sprite-count="124"
+         data-label="Rock Thrower">
+      <span class="era-tag">Era I</span>
+      <div class="playing-pip"></div>
+      <img class="char-sprite" src="assets/Stone Man/stone-man-attacking/0001.jpg" alt="Stone Man">
+      <div class="char-info">
+        <div class="char-name">Rock Thrower</div>
+        <button class="play-btn">&#9654; Play Sound</button>
+      </div>
+    </div>
+
+    <div class="char-card" data-sfx="spear"
+         data-sprite-base="assets/Spear Man/spear-man-attacking/" data-sprite-fmt="4d" data-sprite-ext="jpg" data-sprite-count="100"
+         data-label="Spear Man">
+      <span class="era-tag">Era I</span>
+      <div class="playing-pip"></div>
+      <img class="char-sprite" src="assets/Spear Man/spear-man-attacking/0001.jpg" alt="Spear Man">
+      <div class="char-info">
+        <div class="char-name">Spear Man</div>
+        <button class="play-btn">&#9654; Play Sound</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Era II — Characters -->
+<div class="section section-char">
+  <div class="section-label">Era II — Medieval &nbsp;·&nbsp; Characters</div>
+  <div class="char-grid">
+
+    <div class="char-card" data-sfx="swordsman"
+         data-sprite-base="assets/Sword Man/sword-man-attacking/" data-sprite-fmt="4d" data-sprite-ext="jpg" data-sprite-count="123"
+         data-label="Swordsman">
+      <span class="era-tag">Era II</span>
+      <div class="playing-pip"></div>
+      <img class="char-sprite" src="assets/Sword Man/sword-man-attacking/0001.jpg" alt="Sword Man">
+      <div class="char-info">
+        <div class="char-name">Swordsman</div>
+        <button class="play-btn">&#9654; Play Sound</button>
+      </div>
+    </div>
+
+    <div class="char-card" data-sfx="archer"
+         data-sprite-base="assets/Bow Man/bow-man-attacking/" data-sprite-fmt="4d" data-sprite-ext="jpg" data-sprite-count="102"
+         data-label="Archer">
+      <span class="era-tag">Era II</span>
+      <div class="playing-pip"></div>
+      <img class="char-sprite" src="assets/Bow Man/bow-man-attacking/0001.jpg" alt="Bow Man">
+      <div class="char-info">
+        <div class="char-name">Archer</div>
+        <button class="play-btn">&#9654; Play Sound</button>
+      </div>
+    </div>
+
+    <div class="char-card" data-sfx="cavalry"
+         data-sprite-base="assets/Horse Man/horse-man-attacking/" data-sprite-fmt="4d" data-sprite-ext="jpg" data-sprite-count="116"
+         data-label="Cavalry">
+      <span class="era-tag">Era II</span>
+      <div class="playing-pip"></div>
+      <img class="char-sprite" src="assets/Horse Man/horse-man-attacking/0001.jpg" alt="Horse Man">
+      <div class="char-info">
+        <div class="char-name">Cavalry</div>
+        <button class="play-btn">&#9654; Play Sound</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Era I — Enemies -->
+<div class="section section-enemy">
+  <div class="section-label">Era I — Prehistoric &nbsp;·&nbsp; Enemies</div>
+  <div class="char-grid">
+
+    <!-- Boar: named PNGs, toggle idle ↔ attack -->
+    <div class="char-card" data-sfx="boar"
+         data-sprite-idle="assets/Boar/Boar_Idle_with_shadow.png"
+         data-sprite-attack="assets/Boar/Boar_Attack_with_shadow.png"
+         data-label="Boar">
+      <span class="era-tag">Enemy</span>
+      <div class="playing-pip"></div>
+      <img class="char-sprite" src="assets/Boar/Boar_Idle_with_shadow.png" alt="Boar">
+      <div class="char-info">
+        <div class="char-name">Boar</div>
+        <button class="play-btn">&#9654; Play Sound</button>
+      </div>
+    </div>
+
+    <div class="char-card" data-sfx="saberToothTiger"
+         data-sprite-base="assets/Saber Tooth Tiger/saber-tooth-tiger-attacking/" data-sprite-fmt="4d" data-sprite-ext="jpg" data-sprite-count="175"
+         data-label="Saber-Tooth Tiger">
+      <span class="era-tag">Enemy</span>
+      <div class="playing-pip"></div>
+      <img class="char-sprite" src="assets/Saber Tooth Tiger/saber-tooth-tiger-attacking/0001.jpg" alt="Saber Tooth Tiger">
+      <div class="char-info">
+        <div class="char-name">Saber-Tooth Tiger</div>
+        <button class="play-btn">&#9654; Play Sound</button>
+      </div>
+    </div>
+
+    <!-- Mammoth: ezgif-frame-001.png format, 22 frames -->
+    <div class="char-card" data-sfx="mammoth"
+         data-sprite-base="assets/Mammoth/mammoth_attacking/" data-sprite-fmt="ezgif" data-sprite-ext="png" data-sprite-count="22"
+         data-label="Mammoth">
+      <span class="era-tag">Enemy</span>
+      <div class="playing-pip"></div>
+      <img class="char-sprite" src="assets/Mammoth/mammoth_attacking/ezgif-frame-001.png" alt="Mammoth">
+      <div class="char-info">
+        <div class="char-name">Mammoth</div>
+        <button class="play-btn">&#9654; Play Sound</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   WEB AUDIO — ANALYSER + SFX LIBRARY
+══════════════════════════════════════════ */
+let _analyser = null;
+
+const SFX = {
+  _ctx: null,
+  get ctx() {
+    if (!this._ctx || this._ctx.state === 'closed')
+      this._ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // Ensure analyser is attached
+    if (!_analyser || _analyser.context !== this._ctx) {
+      _analyser = this._ctx.createAnalyser();
+      _analyser.fftSize = 1024;
+      _analyser.smoothingTimeConstant = 0.7;
+      _analyser.connect(this._ctx.destination);
+    }
+    return this._ctx;
+  },
+
+  out(vol = 0.7) {
+    const g = this.ctx.createGain(); g.gain.value = vol;
+    g.connect(_analyser); return g;
+  },
+  reverb(secs = 1.6) {
+    const c = this.ctx, cv = c.createConvolver();
+    const len = c.sampleRate * secs, buf = c.createBuffer(2, len, c.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = buf.getChannelData(ch);
+      for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/len, 2.4);
+    }
+    cv.buffer = buf; return cv;
+  },
+  dist(k = 100) {
+    const ws = this.ctx.createWaveShaper(), n = 512, curve = new Float32Array(n);
+    for (let i = 0; i < n; i++) { const x=(i*2)/n-1; curve[i]=((Math.PI+k)*x)/(Math.PI+k*Math.abs(x)); }
+    ws.curve = curve; return ws;
+  },
+  noise(dur) {
+    const c = this.ctx, buf = c.createBuffer(1, c.sampleRate*dur, c.sampleRate);
+    const d = buf.getChannelData(0); for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    const src = c.createBufferSource(); src.buffer = buf; return src;
+  },
+  env(node, now, atk, sus, rel, vol=1) {
+    node.gain.setValueAtTime(0, now);
+    node.gain.linearRampToValueAtTime(vol, now+atk);
+    node.gain.setValueAtTime(vol, now+atk+sus);
+    node.gain.exponentialRampToValueAtTime(0.0001, now+atk+sus+rel);
+  },
+
+  // ── ERA I CHARACTERS ─────────────────────────
+
+  club() {
+    const c=this.ctx, now=c.currentTime, o=this.out(0.82);
+    const wind=this.noise(0.22), wlp=c.createBiquadFilter(), wg=c.createGain();
+    wlp.type='lowpass'; wlp.frequency.value=200; wlp.Q.value=6;
+    this.env(wg, now, 0.05, 0.12, 0.04, 0.35);
+    wind.connect(wlp); wlp.connect(wg); wg.connect(o); wind.start(now); wind.stop(now+0.24);
+    const ns=this.noise(0.28), d=this.dist(250), lp=c.createBiquadFilter(), eg=c.createGain();
+    lp.type='lowpass'; lp.frequency.value=180; lp.Q.value=8;
+    this.env(eg, now+0.22, 0.001, 0.03, 0.28, 1.3);
+    ns.connect(d); d.connect(lp); lp.connect(eg); eg.connect(o); ns.start(now+0.22); ns.stop(now+0.55);
+    const boom=c.createOscillator(), bg=c.createGain(); boom.type='sine';
+    boom.frequency.setValueAtTime(85,now+0.22); boom.frequency.exponentialRampToValueAtTime(22,now+0.52);
+    this.env(bg, now+0.22, 0.001, 0.04, 0.32, 1.1);
+    boom.connect(bg); bg.connect(o); boom.start(now+0.22); boom.stop(now+0.58);
+    const gr=c.createOscillator(), gg=c.createGain(); gr.type='sawtooth'; gr.frequency.value=42;
+    this.env(gg, now+0.4, 0.08, 0.2, 0.4, 0.22);
+    gr.connect(gg); gg.connect(o); gr.start(now+0.4); gr.stop(now+1.1);
+    return 1.15;
+  },
+
+  rockThrower() {
+    const c=this.ctx, now=c.currentTime, o=this.out(0.75);
+    const gns=this.noise(0.09), gbp=c.createBiquadFilter(), gbp2=c.createBiquadFilter(), gg=c.createGain();
+    gbp.type='bandpass'; gbp.frequency.value=350; gbp.Q.value=5;
+    gbp2.type='bandpass'; gbp2.frequency.value=900; gbp2.Q.value=3;
+    this.env(gg, now, 0.005, 0.04, 0.04, 0.6);
+    gns.connect(gbp); gns.connect(gbp2); gbp.connect(gg); gbp2.connect(gg); gg.connect(o);
+    gns.start(now); gns.stop(now+0.12);
+    const ns=this.noise(0.38), bp=c.createBiquadFilter(), wg=c.createGain();
+    const spinLfo=c.createOscillator(), spinG=c.createGain();
+    spinLfo.frequency.value=14; spinG.gain.value=0.25;
+    bp.type='bandpass'; bp.frequency.setValueAtTime(2800,now+0.1); bp.frequency.exponentialRampToValueAtTime(150,now+0.42); bp.Q.value=3;
+    wg.gain.value=0.6;
+    spinLfo.connect(spinG); spinG.connect(wg.gain);
+    ns.connect(bp); bp.connect(wg); wg.connect(o);
+    ns.start(now+0.1); ns.stop(now+0.5); spinLfo.start(now+0.1); spinLfo.stop(now+0.5);
+    const cr=c.createOscillator(), crg=c.createGain(); cr.type='sawtooth';
+    cr.frequency.setValueAtTime(320,now+0.42); cr.frequency.exponentialRampToValueAtTime(40,now+0.56);
+    this.env(crg, now+0.41, 0.002, 0.015, 0.18, 1.1);
+    cr.connect(crg); crg.connect(o); cr.start(now+0.41); cr.stop(now+0.62);
+    return 0.65;
+  },
+
+  spear() {
+    const c=this.ctx, now=c.currentTime, o=this.out(0.72);
+    const pause=c.createOscillator(), pg=c.createGain(); pause.type='sine'; pause.frequency.value=38;
+    this.env(pg, now, 0.05, 0.12, 0.05, 0.06);
+    pause.connect(pg); pg.connect(o); pause.start(now); pause.stop(now+0.22);
+    const ns=this.noise(0.26), hp=c.createBiquadFilter(), bp=c.createBiquadFilter(), ag=c.createGain();
+    hp.type='highpass'; hp.frequency.value=3500;
+    bp.type='bandpass'; bp.frequency.setValueAtTime(5500,now+0.22); bp.frequency.exponentialRampToValueAtTime(1200,now+0.46); bp.Q.value=4;
+    this.env(ag, now+0.22, 0.008, 0.12, 0.08, 0.9);
+    ns.connect(hp); hp.connect(bp); bp.connect(ag); ag.connect(o); ns.start(now+0.22); ns.stop(now+0.5);
+    const imp=c.createOscillator(), ig=c.createGain(); imp.type='sine';
+    imp.frequency.setValueAtTime(280,now+0.46); imp.frequency.exponentialRampToValueAtTime(55,now+0.58);
+    this.env(ig, now+0.45, 0.001, 0.01, 0.22, 0.85);
+    imp.connect(ig); ig.connect(o); imp.start(now+0.45); imp.stop(now+0.72);
+    const ping=c.createOscillator(), pigg=c.createGain(); ping.type='sine'; ping.frequency.value=3200;
+    this.env(pigg, now+0.46, 0.001, 0.005, 0.5, 0.15);
+    ping.connect(pigg); pigg.connect(o); ping.start(now+0.46); ping.stop(now+1.0);
+    return 1.0;
+  },
+
+  // ── ERA II CHARACTERS ────────────────────────
+
+  swordsman() {
+    const c=this.ctx, now=c.currentTime, o=this.out(0.78);
+    const sn=this.noise(0.28), shp=c.createBiquadFilter(), sbp=c.createBiquadFilter(), sdg=c.createGain();
+    shp.type='highpass'; shp.frequency.value=3000;
+    sbp.type='bandpass'; sbp.frequency.value=6000; sbp.Q.value=2;
+    this.env(sdg, now, 0.04, 0.18, 0.04, 0.38);
+    sn.connect(shp); shp.connect(sbp); sbp.connect(sdg); sdg.connect(o); sn.start(now); sn.stop(now+0.3);
+    const ns=this.noise(0.1), bp=c.createBiquadFilter(), slg=c.createGain();
+    bp.type='bandpass'; bp.frequency.value=3200; bp.Q.value=2.5;
+    this.env(slg, now+0.3, 0.002, 0.025, 0.07, 0.95);
+    ns.connect(bp); bp.connect(slg); slg.connect(o); ns.start(now+0.3); ns.stop(now+0.42);
+    [[293,1.0],[349,0.65],[440,0.45],[220,0.3]].forEach(([f,v],i)=>{
+      const r=c.createOscillator(), rg=c.createGain(); r.type='sine'; r.frequency.value=f;
+      this.env(rg, now+0.32+i*0.012, 0.006, 0.04, 0.7+i*0.12, v*0.26);
+      r.connect(rg); rg.connect(o); r.start(now+0.32); r.stop(now+1.2);
+    });
+    return 1.2;
+  },
+
+  archer() {
+    const c=this.ctx, now=c.currentTime, o=this.out(0.72);
+    const cr=c.createOscillator(), crg=c.createGain(); cr.type='sawtooth';
+    cr.frequency.setValueAtTime(220,now); cr.frequency.linearRampToValueAtTime(180,now+0.35);
+    const crdist=this.dist(30), crfilt=c.createBiquadFilter();
+    crfilt.type='bandpass'; crfilt.frequency.value=600; crfilt.Q.value=8;
+    this.env(crg, now, 0.05, 0.25, 0.04, 0.22);
+    cr.connect(crdist); crdist.connect(crfilt); crfilt.connect(crg); crg.connect(o);
+    cr.start(now); cr.stop(now+0.4);
+    const tw=c.createOscillator(), twg=c.createGain(); tw.type='triangle';
+    tw.frequency.setValueAtTime(195,now+0.36); tw.frequency.exponentialRampToValueAtTime(48,now+0.48);
+    this.env(twg, now+0.36, 0.001, 0.015, 0.12, 1.0);
+    tw.connect(twg); twg.connect(o); tw.start(now+0.36); tw.stop(now+0.52);
+    const ns=this.noise(0.55), bp=c.createBiquadFilter(), aw=c.createGain();
+    bp.type='bandpass'; bp.frequency.setValueAtTime(4500,now+0.38); bp.frequency.exponentialRampToValueAtTime(800,now+0.9); bp.Q.value=5;
+    this.env(aw, now+0.38, 0.02, 0.32, 0.18, 0.48);
+    ns.connect(bp); bp.connect(aw); aw.connect(o); ns.start(now+0.38); ns.stop(now+0.95);
+    return 0.95;
+  },
+
+  cavalry() {
+    const c=this.ctx, now=c.currentTime, o=this.out(0.78);
+    const rv=this.reverb(1.4), rvg=c.createGain(); rvg.gain.value=0.3; rv.connect(rvg); rvg.connect(o);
+    const rum=this.noise(0.55), rlp=c.createBiquadFilter(), rg=c.createGain();
+    rlp.type='lowpass'; rlp.frequency.value=120;
+    this.env(rg, now, 0.12, 0.3, 0.14, 0.5);
+    rum.connect(rlp); rlp.connect(rg); rg.connect(o); rg.connect(rv); rum.start(now); rum.stop(now+0.6);
+    [0.12,0.22,0.30,0.38,0.44,0.50,0.54,0.58].forEach((t,i)=>{
+      const ns=this.noise(0.1), lp=c.createBiquadFilter(), eg=c.createGain();
+      lp.type='lowpass'; lp.frequency.value=350+i*15;
+      this.env(eg, now+t, 0.002, 0.018, 0.07, 0.38+i*0.07);
+      ns.connect(lp); lp.connect(eg); eg.connect(o); ns.start(now+t); ns.stop(now+t+0.12);
+    });
+    const wh=c.createOscillator(), wd=this.dist(70), wg=c.createGain(); wh.type='sawtooth';
+    wh.frequency.setValueAtTime(480,now+0.6); wh.frequency.setValueAtTime(580,now+0.68); wh.frequency.exponentialRampToValueAtTime(260,now+0.88);
+    this.env(wg, now+0.6, 0.02, 0.15, 0.2, 0.38);
+    wh.connect(wd); wd.connect(wg); wg.connect(o); wg.connect(rv); wh.start(now+0.6); wh.stop(now+0.95);
+    return 1.0;
+  },
+
+  // ── ERA I ENEMIES ────────────────────────────
+
+  boar() {
+    const c=this.ctx, now=c.currentTime, o=this.out(0.80);
+    [0, 0.13].forEach((t,i)=>{
+      const sn=this.noise(0.08), bp=c.createBiquadFilter(), sg=c.createGain();
+      bp.type='bandpass'; bp.frequency.value=380+i*60; bp.Q.value=3;
+      this.env(sg, now+t, 0.003, 0.04, 0.04, 0.7+i*0.15);
+      sn.connect(bp); bp.connect(sg); sg.connect(o); sn.start(now+t); sn.stop(now+t+0.1);
+      const nr=c.createOscillator(), ng=c.createGain(); nr.type='triangle'; nr.frequency.value=155+i*20;
+      this.env(ng, now+t, 0.004, 0.03, 0.03, 0.18);
+      nr.connect(ng); ng.connect(o); nr.start(now+t); nr.stop(now+t+0.08);
+    });
+    [0.25,0.33,0.39,0.44,0.48,0.52,0.55].forEach((t,i)=>{
+      const ns=this.noise(0.07), lp=c.createBiquadFilter(), eg=c.createGain();
+      lp.type='lowpass'; lp.frequency.value=280+i*10;
+      this.env(eg, now+t, 0.002, 0.012, 0.055, 0.5+i*0.08);
+      ns.connect(lp); lp.connect(eg); eg.connect(o); ns.start(now+t); ns.stop(now+t+0.09);
+    });
+    const cr=c.createOscillator(), cd=this.dist(200), cg=c.createGain(); cr.type='sawtooth';
+    cr.frequency.setValueAtTime(180,now+0.58); cr.frequency.exponentialRampToValueAtTime(35,now+0.73);
+    this.env(cg, now+0.57, 0.001, 0.012, 0.26, 1.0);
+    cr.connect(cd); cd.connect(cg); cg.connect(o); cr.start(now+0.57); cr.stop(now+0.86);
+    const bm=c.createOscillator(), bg=c.createGain(); bm.type='sine';
+    bm.frequency.setValueAtTime(70,now+0.58); bm.frequency.exponentialRampToValueAtTime(20,now+0.78);
+    this.env(bg, now+0.57, 0.001, 0.02, 0.22, 0.9);
+    bm.connect(bg); bg.connect(o); bm.start(now+0.57); bm.stop(now+0.85);
+    const sq=c.createOscillator(), sqd=this.dist(60), sqg=c.createGain(); sq.type='sawtooth';
+    sq.frequency.setValueAtTime(440,now+0.66); sq.frequency.exponentialRampToValueAtTime(210,now+0.88);
+    this.env(sqg, now+0.65, 0.01, 0.1, 0.16, 0.28);
+    sq.connect(sqd); sqd.connect(sqg); sqg.connect(o); sq.start(now+0.65); sq.stop(now+0.96);
+    return 1.0;
+  },
+
+  saberToothTiger() {
+    const c=this.ctx, now=c.currentTime, o=this.out(0.78);
+    const rv=this.reverb(1.2), rvg=c.createGain(); rvg.gain.value=0.25; rv.connect(rvg); rvg.connect(o);
+    const gr=c.createOscillator(), grd=this.dist(55), gg=c.createGain(); gr.type='sawtooth'; gr.frequency.value=62;
+    const vlfo=c.createOscillator(), vg=c.createGain(); vlfo.frequency.value=8; vg.gain.value=8;
+    vlfo.connect(vg); vg.connect(gr.frequency);
+    this.env(gg, now, 0.06, 0.28, 0.08, 0.55);
+    gr.connect(grd); grd.connect(gg); gg.connect(o); gg.connect(rv);
+    gr.start(now); gr.stop(now+0.42); vlfo.start(now); vlfo.stop(now+0.42);
+    const hs=this.noise(0.18), hbp=c.createBiquadFilter(), hg=c.createGain();
+    hbp.type='bandpass'; hbp.frequency.value=7200; hbp.Q.value=2;
+    this.env(hg, now+0.36, 0.04, 0.1, 0.04, 0.33);
+    hs.connect(hbp); hbp.connect(hg); hg.connect(o); hs.start(now+0.36); hs.stop(now+0.56);
+    const pns=this.noise(0.22), pbp=c.createBiquadFilter(), pg=c.createGain();
+    pbp.type='bandpass'; pbp.frequency.setValueAtTime(820,now+0.56); pbp.frequency.exponentialRampToValueAtTime(190,now+0.79); pbp.Q.value=1.5;
+    this.env(pg, now+0.56, 0.02, 0.12, 0.06, 0.52);
+    pns.connect(pbp); pbp.connect(pg); pg.connect(o); pns.start(now+0.56); pns.stop(now+0.83);
+    const roar=c.createOscillator(), rd=this.dist(85), rg=c.createGain(); roar.type='sawtooth';
+    roar.frequency.setValueAtTime(320,now+0.77); roar.frequency.setValueAtTime(255,now+0.83); roar.frequency.exponentialRampToValueAtTime(82,now+1.12);
+    this.env(rg, now+0.76, 0.01, 0.22, 0.32, 0.66);
+    roar.connect(rd); rd.connect(rg); rg.connect(o); rg.connect(rv); roar.start(now+0.76); roar.stop(now+1.22);
+    const bt=c.createOscillator(), btd=this.dist(180), btg=c.createGain(); bt.type='square';
+    bt.frequency.setValueAtTime(95,now+0.79); bt.frequency.exponentialRampToValueAtTime(26,now+0.92);
+    this.env(btg, now+0.78, 0.001, 0.016, 0.18, 0.82);
+    bt.connect(btd); btd.connect(btg); btg.connect(o); bt.start(now+0.78); bt.stop(now+1.02);
+    return 1.25;
+  },
+
+  mammoth() {
+    const c=this.ctx, now=c.currentTime, o=this.out(0.85);
+    const rv=this.reverb(2.0), rvg=c.createGain(); rvg.gain.value=0.45; rv.connect(rvg); rvg.connect(o);
+    const trm=c.createOscillator(), tg=c.createGain(); trm.type='sine'; trm.frequency.value=22;
+    this.env(tg, now, 0.15, 0.35, 0.1, 0.6);
+    trm.connect(tg); tg.connect(o); trm.start(now); trm.stop(now+0.65);
+    [0.1,0.28,0.42,0.54,0.63].forEach((t,i)=>{
+      const sn=this.noise(0.14), lp=c.createBiquadFilter(), eg=c.createGain();
+      lp.type='lowpass'; lp.frequency.value=150+i*8;
+      this.env(eg, now+t, 0.002, 0.02, 0.14, 0.7+i*0.08);
+      sn.connect(lp); lp.connect(eg); eg.connect(o); eg.connect(rv); sn.start(now+t); sn.stop(now+t+0.18);
+      const bm=c.createOscillator(), bg=c.createGain(); bm.type='sine';
+      bm.frequency.setValueAtTime(55+i*3,now+t); bm.frequency.exponentialRampToValueAtTime(18,now+t+0.22);
+      this.env(bg, now+t, 0.001, 0.025, 0.18, 0.82);
+      bm.connect(bg); bg.connect(o); bg.connect(rv); bm.start(now+t); bm.stop(now+t+0.3);
+    });
+    const tr=c.createOscillator(), trd=this.dist(35), trg=c.createGain(); tr.type='sawtooth';
+    tr.frequency.setValueAtTime(110,now+0.7); tr.frequency.setValueAtTime(168,now+0.78); tr.frequency.exponentialRampToValueAtTime(58,now+1.22);
+    const trhp=c.createBiquadFilter(); trhp.type='peaking'; trhp.frequency.value=400; trhp.gain.value=8;
+    this.env(trg, now+0.7, 0.02, 0.38, 0.48, 0.85);
+    tr.connect(trd); trd.connect(trhp); trhp.connect(trg); trg.connect(o); trg.connect(rv);
+    tr.start(now+0.7); tr.stop(now+1.45);
+    const swns=this.noise(0.3), swbp=c.createBiquadFilter(), swg=c.createGain();
+    swbp.type='bandpass'; swbp.frequency.setValueAtTime(620,now+0.72); swbp.frequency.exponentialRampToValueAtTime(95,now+1.02); swbp.Q.value=1.2;
+    this.env(swg, now+0.72, 0.04, 0.2, 0.1, 0.44);
+    swns.connect(swbp); swbp.connect(swg); swg.connect(o); swns.start(now+0.72); swns.stop(now+1.06);
+    return 1.5;
+  },
+};
+
+/* ══════════════════════════════════════════
+   OSCILLOSCOPE DRAW LOOP
+══════════════════════════════════════════ */
+const scopeCanvas = document.getElementById('scope');
+const ctx2d = scopeCanvas.getContext('2d');
+const W = scopeCanvas.width, H = scopeCanvas.height;
+const dataArr = new Uint8Array(512);
+
+function drawScope() {
+  requestAnimationFrame(drawScope);
+  if (!_analyser) {
+    // Draw flat line when silent
+    ctx2d.fillStyle = 'rgba(0,15,3,0.4)';
+    ctx2d.fillRect(0, 0, W, H);
+    ctx2d.strokeStyle = 'rgba(0,200,50,0.18)';
+    ctx2d.lineWidth = 1;
+    ctx2d.beginPath(); ctx2d.moveTo(0, H/2); ctx2d.lineTo(W, H/2); ctx2d.stroke();
+    return;
+  }
+  _analyser.getByteTimeDomainData(dataArr);
+
+  // Phosphor trail effect
+  ctx2d.fillStyle = 'rgba(0,14,3,0.38)';
+  ctx2d.fillRect(0, 0, W, H);
+
+  // Scanline grid (subtle)
+  ctx2d.strokeStyle = 'rgba(0,100,20,0.06)';
+  ctx2d.lineWidth = 0.5;
+  for (let y = 0; y < H; y += 18) {
+    ctx2d.beginPath(); ctx2d.moveTo(0,y); ctx2d.lineTo(W,y); ctx2d.stroke();
+  }
+  for (let x = 0; x < W; x += 60) {
+    ctx2d.beginPath(); ctx2d.moveTo(x,0); ctx2d.lineTo(x,H); ctx2d.stroke();
+  }
+
+  // Waveform
+  const sliceW = W / dataArr.length;
+  ctx2d.lineWidth = 1.8;
+  ctx2d.strokeStyle = '#00FF55';
+  ctx2d.shadowBlur = 6;
+  ctx2d.shadowColor = '#00FF55';
+  ctx2d.beginPath();
+  for (let i = 0; i < dataArr.length; i++) {
+    const v = dataArr[i] / 128.0;
+    const y = (v * H) / 2;
+    if (i === 0) ctx2d.moveTo(0, y);
+    else ctx2d.lineTo(i * sliceW, y);
+  }
+  ctx2d.stroke();
+  ctx2d.shadowBlur = 0;
+}
+drawScope();
+
+/* ══════════════════════════════════════════
+   SPRITE ANIMATION
+══════════════════════════════════════════ */
+function pad4(n) { return String(n).padStart(4, '0'); }
+function pad3(n) { return String(n).padStart(3, '0'); }
+
+function animateCard(card, durationSec) {
+  const img = card.querySelector('.char-sprite');
+  const base  = card.dataset.spriteBase;
+  const fmt   = card.dataset.spriteFmt;
+  const ext   = card.dataset.spriteExt;
+  const count = parseInt(card.dataset.spriteCount || '0');
+  const idleSrc   = card.dataset.spriteIdle;
+  const attackSrc = card.dataset.spriteAttack;
+
+  card.classList.add('playing');
+
+  // Boar: toggle named PNGs
+  if (attackSrc) {
+    img.src = attackSrc;
+    setTimeout(() => {
+      card.classList.remove('playing');
+      img.src = idleSrc;
+    }, durationSec * 1000);
+    return;
+  }
+
+  if (!base || count === 0) {
+    setTimeout(() => card.classList.remove('playing'), durationSec * 1000);
+    return;
+  }
+
+  // Numbered sequence — cycle through at 12fps
+  let frame = 1;
+  const fps = 12;
+  const iv = setInterval(() => {
+    let filename;
+    if (fmt === 'ezgif') {
+      filename = `ezgif-frame-${pad3(frame)}.${ext}`;
+    } else {
+      filename = `${pad4(frame)}.${ext}`;
+    }
+    img.src = base + filename;
+    frame = (frame % count) + 1;
+  }, 1000 / fps);
+
+  setTimeout(() => {
+    clearInterval(iv);
+    card.classList.remove('playing');
+    // Reset to frame 1
+    if (fmt === 'ezgif') img.src = base + `ezgif-frame-001.${ext}`;
+    else img.src = base + `0001.${ext}`;
+  }, durationSec * 1000);
+}
+
+/* ══════════════════════════════════════════
+   CARD CLICK HANDLERS
+══════════════════════════════════════════ */
+const nowPlayingEl = document.getElementById('nowPlaying');
+
+document.querySelectorAll('.char-card').forEach(card => {
+  card.addEventListener('click', () => {
+    // Resume AudioContext on first gesture
+    if (SFX._ctx && SFX._ctx.state === 'suspended') SFX._ctx.resume();
+
+    const sfxKey = card.dataset.sfx;
+    const label  = card.dataset.label;
+    const fn = SFX[sfxKey];
+    if (!fn) return;
+
+    const dur = fn.call(SFX);
+
+    nowPlayingEl.textContent = `▶ ${label}`;
+    animateCard(card, dur);
+    setTimeout(() => {
+      if (nowPlayingEl.textContent === `▶ ${label}`) nowPlayingEl.textContent = '';
+    }, dur * 1000 + 200);
+  });
+});
+</script>
+</body>
+</html>
