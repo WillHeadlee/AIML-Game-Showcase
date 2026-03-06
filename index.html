@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Towers of Time</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0a0a0a;
+      font-family: 'Cinzel', Georgia, serif;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #FFD700;
+      text-shadow: 0 0 30px rgba(255,215,0,0.4);
+      margin-bottom: 0.25rem;
+    }
+
+    .tagline {
+      font-size: 0.9rem;
+      letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 3rem;
+    }
+
+    .play-btn {
+      display: inline-block;
+      padding: 1rem 3.5rem;
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: #000;
+      background: #FFD700;
+      border: 2px solid #FFD700;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+
+    .play-btn:hover {
+      background: transparent;
+      color: #FFD700;
+      box-shadow: 0 0 24px rgba(255,215,0,0.5);
+    }
+  </style>
+</head>
+<body>
+  <h1>Towers of Time</h1>
+  <p class="tagline">Five Eras &nbsp;·&nbsp; Infinite Battles &nbsp;·&nbsp; One Destiny</p>
+  <a class="play-btn" href="game.html">Play</a>
+</body>
+</html>

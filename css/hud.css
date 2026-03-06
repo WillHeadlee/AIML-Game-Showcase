@@ -1,0 +1,14 @@
+/* ============================================================
+   hud.css — HUD overlay styles
+   (Populated in later steps)
+   ============================================================ */
+
+#hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  pointer-events: none;
+  z-index: 10;
+}
