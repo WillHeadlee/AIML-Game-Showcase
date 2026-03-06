@@ -13,10 +13,20 @@ let canvas, ctx;
 let lastTimestamp = 0;
 let assetsReady   = false;
 
+// ----- Canvas scaling -----
+function scaleCanvas() {
+  const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  canvas.style.transform  = `scale(${scale})`;
+  canvas.style.marginLeft = `${(window.innerWidth  - 1920 * scale) / 2}px`;
+  canvas.style.marginTop  = `${(window.innerHeight - 1080 * scale) / 2}px`;
+}
+
 // ----- Init -----
 function init() {
   canvas = document.getElementById('game-canvas');
   ctx    = canvas.getContext('2d');
+  scaleCanvas();
+  window.addEventListener('resize', scaleCanvas);
 
   Renderer.init(ctx);
   Town.init(state.currentEra);
