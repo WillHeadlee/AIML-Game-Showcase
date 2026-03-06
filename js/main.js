@@ -16,13 +16,12 @@ let assetsReady   = false;
 // ----- Viewport scaling -----
 function scaleGame() {
   const wrapper = document.getElementById('game-wrapper');
-  const scale   = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  const left  = Math.floor((window.innerWidth  - 1920 * scale) / 2);
+  const top   = Math.floor((window.innerHeight - 1080 * scale) / 2);
   wrapper.style.transform = `scale(${scale})`;
-  // Compensate for top-left origin so flexbox centering still works
-  const offsetX = (1920 * scale - 1920) / 2;
-  const offsetY = (1080 * scale - 1080) / 2;
-  wrapper.style.marginLeft = `${offsetX}px`;
-  wrapper.style.marginTop  = `${offsetY}px`;
+  wrapper.style.left      = `${left}px`;
+  wrapper.style.top       = `${top}px`;
 }
 
 // ----- Init -----
@@ -128,13 +127,11 @@ function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   Renderer.drawZones();
-  Renderer.drawPath();
   Renderer.drawGrid();
   Renderer.drawBarricades();
   Renderer.drawTowers();
   Renderer.drawBuildHighlight();
   Renderer.drawEnemies();
-  Renderer.drawWall();
 
   UI.renderHUD();
 }
