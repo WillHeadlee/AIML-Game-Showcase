@@ -4,8 +4,13 @@
 
 const Renderer = (() => {
   let ctx;
+  let mapBg = null;
 
-  function init(context) { ctx = context; }
+  function init(context) {
+    ctx = context;
+    mapBg = new Image();
+    mapBg.src = 'assets/Map.jpeg';
+  }
 
   // ----- Era theme helpers -----
   const ERA_THEMES = {
@@ -20,12 +25,16 @@ const Renderer = (() => {
 
   // ----- Zone backgrounds -----
   function drawZones() {
-    const wallX = Map.WALL_COL * Map.CELL;
-    const theme = _theme();
-    ctx.fillStyle = theme.defenseZone;
-    ctx.fillRect(0, 0, wallX, 1080);
-    ctx.fillStyle = theme.settlementZone;
-    ctx.fillRect(wallX, 0, 1920 - wallX, 1080);
+    if (mapBg && mapBg.complete && mapBg.naturalWidth > 0) {
+      ctx.drawImage(mapBg, 0, 0, 1920, 1080);
+    } else {
+      const wallX = Map.WALL_COL * Map.CELL;
+      const theme = _theme();
+      ctx.fillStyle = theme.defenseZone;
+      ctx.fillRect(0, 0, wallX, 1080);
+      ctx.fillStyle = theme.settlementZone;
+      ctx.fillRect(wallX, 0, 1920 - wallX, 1080);
+    }
   }
 
   // ----- Path corridor -----
