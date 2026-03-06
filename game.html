@@ -13,11 +13,11 @@
 </head>
 <body>
 
-  <!-- Game canvas: 1920x1080 fixed resolution -->
-  <canvas id="game-canvas" width="1920" height="1080"></canvas>
-
-  <!-- HUD overlay (populated by JS) -->
-  <div id="hud"></div>
+  <!-- Game wrapper: scaled to fit viewport -->
+  <div id="game-wrapper">
+    <canvas id="game-canvas" width="1920" height="1080"></canvas>
+    <div id="hud"></div>
+  </div>
 
   <!-- Scripts (order matters — each module references globals from earlier scripts) -->
   <script src="js/events.js"></script>

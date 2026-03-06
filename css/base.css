@@ -16,6 +16,18 @@ html, body {
   background: #000;
   font-family: 'Cinzel', 'Georgia', serif;
   color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ----- Game wrapper: fixed 1920x1080, scaled to fit viewport ----- */
+#game-wrapper {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  flex-shrink: 0;
+  transform-origin: top left;
 }
 
 /* ----- Font import ----- */
@@ -82,11 +94,10 @@ html, body {
   --canvas-h: 1080px;
 }
 
-/* ----- Canvas wrapper ----- */
+/* ----- Canvas ----- */
 #game-canvas {
   display: block;
   width: 1920px;
   height: 1080px;
   background: #0a0a0a;
-  transform-origin: top left;
 }
