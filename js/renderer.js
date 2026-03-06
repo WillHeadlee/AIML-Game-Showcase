@@ -37,33 +37,8 @@ const Renderer = (() => {
     }
   }
 
-  // ----- Path corridor -----
-  function drawPath() {
-    const len = Path.calculateTotalLength();
-    if (!len) return;
-
-    const pts = [];
-    for (let d = 0; d <= len; d += 5) pts.push(Path.getPositionAtDistance(d));
-
-    const theme = _theme();
-
-    const stroke = (width, style) => {
-      ctx.lineWidth   = width;
-      ctx.strokeStyle = style;
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x, pts[0].y);
-      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
-      ctx.stroke();
-    };
-
-    ctx.save();
-    ctx.lineCap  = 'round';
-    ctx.lineJoin = 'round';
-    stroke(168, 'rgba(15, 8, 0, 0.55)');
-    stroke(160, theme.pathFill);
-    stroke(90,  theme.pathHighlight);
-    ctx.restore();
-  }
+  // ----- Path corridor — invisible (map image shows the real path) -----
+  function drawPath() { /* intentionally empty */ }
 
   // ----- Grid cells -----
   function drawGrid() {
@@ -82,9 +57,7 @@ const Renderer = (() => {
             ctx.strokeRect(px + 0.5, py + 0.5, Map.CELL - 1, Map.CELL - 1);
             break;
           case 'path':
-            ctx.strokeStyle = 'rgba(255,200,100,0.08)';
-            ctx.lineWidth = 0.5;
-            ctx.strokeRect(px + 0.5, py + 0.5, Map.CELL - 1, Map.CELL - 1);
+            // invisible — path is shown by the map image
             break;
           case 'wall':
             ctx.fillStyle = 'rgba(100,80,50,0.25)';

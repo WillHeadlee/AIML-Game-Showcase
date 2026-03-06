@@ -3,15 +3,14 @@
    ============================================================ */
 
 const Path = (() => {
-  // 5 base waypoints in canvas pixels.
-  // Forms an S-curve through the defense zone (x: 0–960).
-  // P0 = left-edge spawn. P4 = wall entry at row 13 (y=540).
+  // 5 base waypoints in canvas pixels, tracing the dirt path in Map.jpeg.
+  // Enters left edge low (~row 15), curves gently up to gate (~row 11.75).
   const WAYPOINTS = [
-    { x:   0, y: 200 },   // P0 — left edge, upper area (row ~4.5)
-    { x: 240, y: 880 },   // P1 — quarter-way, lower  (row ~21.5)
-    { x: 480, y: 200 },   // P2 — halfway,    upper   (row ~4.5)
-    { x: 720, y: 880 },   // P3 — three-quarter, lower (row ~21.5)
-    { x: 940, y: 540 },   // P4 — col 23 center, row 13 (wall)
+    { x:   0, y: 620 },   // P0 — left edge entry (row ~15)
+    { x: 180, y: 600 },   // P1 — begins arcing upward
+    { x: 400, y: 530 },   // P2 — rising through mid-zone
+    { x: 680, y: 478 },   // P3 — levelling near gate height
+    { x: 940, y: 468 },   // P4 — gate entry (row ~11.7, wall col 23)
   ];
 
   // Arc-length lookup table entry: { seg, t, x, y, dist }
