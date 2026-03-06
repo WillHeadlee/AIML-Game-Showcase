@@ -55,12 +55,21 @@ const Map = (() => {
   function isDefenseZone(gx) { return gx >= DEFENSE_ZONE.minCol && gx <= DEFENSE_ZONE.maxCol; }
   function isSettlementZone(gx) { return gx >= SETTLEMENT_ZONE.minCol && gx <= SETTLEMENT_ZONE.maxCol; }
 
+  // isAdjacentToPath(gx, gy) — true if any of the 4 cardinal neighbors is a path cell.
+  function isAdjacentToPath(gx, gy) {
+    const neighbors = [[gx - 1, gy], [gx + 1, gy], [gx, gy - 1], [gx, gy + 1]];
+    return neighbors.some(([nx, ny]) => {
+      const c = getCell(nx, ny);
+      return c && c.state === 'path';
+    });
+  }
+
   return {
     COLS, ROWS, CELL, WALL_COL,
     DEFENSE_ZONE, SETTLEMENT_ZONE,
     grid,
     gridToPixel, pixelToGrid,
     getCell, setCell,
-    isDefenseZone, isSettlementZone,
+    isDefenseZone, isSettlementZone, isAdjacentToPath,
   };
 })();
