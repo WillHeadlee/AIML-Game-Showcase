@@ -16,10 +16,10 @@
   <!-- Game canvas: 1920x1080 fixed resolution -->
   <canvas id="game-canvas" width="1920" height="1080"></canvas>
 
-  <!-- HUD overlay (populated in later steps) -->
+  <!-- HUD overlay (populated by JS) -->
   <div id="hud"></div>
 
-  <!-- Scripts (order matters) -->
+  <!-- Scripts (order matters — each module references globals from earlier scripts) -->
   <script src="js/events.js"></script>
   <script src="js/map.js"></script>
   <script src="js/path.js"></script>
@@ -33,6 +33,7 @@
   <script src="js/waves.js"></script>
   <script src="js/people.js"></script>
   <script src="js/supply.js"></script>
+  <script src="js/abilities.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/overlay.js"></script>
   <script src="js/popups.js"></script>

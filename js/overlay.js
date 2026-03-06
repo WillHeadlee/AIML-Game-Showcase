@@ -1,65 +1,64 @@
 /* ============================================================
-   overlay.js — In-game panel overlays (buildings, supply, etc.)
+   overlay.js — In-game panel overlays (buildings, housing, supply)
    ============================================================ */
 
 // ----- Town Buildings Panel -----
 const TownBuildingsPanel = (() => {
 
-  // Era 1 buildings definition.
-  // Multiple purchases of the same building stack additively.
-  const BUILDINGS = [
-    { id: 'boneYard',   name: 'Bone Yard',   produces: 'bone', rate: 2, goldCost: 30 },
-    { id: 'lumberCamp', name: 'Lumber Camp',  produces: 'wood', rate: 2, goldCost: 30 },
+  // All buildings across all eras — each era unlocks its pair on era advancement.
+  const ALL_BUILDINGS = [
+    { id: 'boneYard',        era: 1, name: 'Bone Yard',         produces: 'bone',      rate: 2, goldCost: 30 },
+    { id: 'lumberCamp',      era: 1, name: 'Lumber Camp',       produces: 'wood',      rate: 2, goldCost: 30 },
+    { id: 'stoneQuarry',     era: 2, name: 'Stone Quarry',      produces: 'stone',     rate: 2, goldCost: 45 },
+    { id: 'ironMine',        era: 2, name: 'Iron Mine',         produces: 'iron',      rate: 2, goldCost: 45 },
+    { id: 'timberMill',      era: 3, name: 'Timber Mill',       produces: 'timber',    rate: 2, goldCost: 60 },
+    { id: 'powderMill',      era: 3, name: 'Powder Mill',       produces: 'gunpowder', rate: 2, goldCost: 60 },
+    { id: 'steelFoundry',    era: 4, name: 'Steel Foundry',     produces: 'steel',     rate: 2, goldCost: 80 },
+    { id: 'oilRefinery',     era: 4, name: 'Oil Refinery',      produces: 'oil',       rate: 2, goldCost: 80 },
+    { id: 'alloyForge',      era: 5, name: 'Alloy Forge',       produces: 'alloy',     rate: 2, goldCost:100 },
+    { id: 'plasmaGenerator', era: 5, name: 'Plasma Generator',  produces: 'plasma',    rate: 2, goldCost:100 },
   ];
 
-  // How many of each building the player currently owns.
   const ownedCounts = {};
-  for (const b of BUILDINGS) ownedCounts[b.id] = 0;
+  for (const b of ALL_BUILDINGS) ownedCounts[b.id] = 0;
 
   let panelEl  = null;
-  const rowEls = {}; // building id -> { countEl }
+  const rowEls = {};
 
-  // ----- init -----
-  // Creates the trigger button inside #hud-town-buttons and builds the overlay panel.
-  // Call after UI.init() so #hud-town-buttons exists.
   function init() {
     _buildTriggerButton();
     _buildPanel();
   }
 
-  // ----- _buildTriggerButton -----
   function _buildTriggerButton() {
     const btn = document.createElement('button');
     btn.className = 'hud-town-btn';
-    btn.style.opacity = '1';   // fully active (unlike stub buttons)
+    btn.style.opacity = '1';
     btn.textContent = 'Buildings';
     btn.addEventListener('click', toggle);
     document.getElementById('hud-town-buttons').appendChild(btn);
   }
 
-  // ----- _buildPanel -----
   function _buildPanel() {
     panelEl = document.createElement('div');
     panelEl.id = 'overlay-buildings';
     panelEl.style.display = 'none';
 
-    // Title
     const title = document.createElement('div');
     title.className = 'overlay-title';
     title.textContent = 'Town Buildings';
     panelEl.appendChild(title);
 
-    // Close button
     const closeBtn = document.createElement('button');
     closeBtn.className = 'overlay-close';
-    closeBtn.textContent = '\u00d7'; // ×
+    closeBtn.textContent = '\u00d7';
     closeBtn.addEventListener('click', close);
     panelEl.appendChild(closeBtn);
 
-    // Building rows
-    for (const b of BUILDINGS) {
+    for (const b of ALL_BUILDINGS) {
       const row = document.createElement('div');
       row.className = 'overlay-building-row';
+      row.dataset.buildingId = b.id;
 
       const nameEl = document.createElement('span');
       nameEl.className = 'overlay-building-name';
@@ -84,30 +83,44 @@ const TownBuildingsPanel = (() => {
 
       row.append(nameEl, prodEl, costEl, countEl, buyBtn);
       panelEl.appendChild(row);
-      rowEls[b.id] = { countEl };
+      rowEls[b.id] = { countEl, row };
     }
 
     document.getElementById('hud').appendChild(panelEl);
+    _refreshVisibility();
   }
 
-  // ----- _onBuy -----
   function _onBuy(building) {
-    if (!Resources.spendGold(building.goldCost)) return; // insufficient gold
+    if (!Resources.spendGold(building.goldCost)) return;
     ownedCounts[building.id]++;
     Resources.addProduction(building.produces, building.rate);
+    // Also register supply production for Era 3+ buildings
+    if (building.era >= 3) Supply.addProduction(1);
     rowEls[building.id].countEl.textContent = `Owned: ${ownedCounts[building.id]}`;
   }
 
-  // ----- toggle / close -----
-  function toggle() {
-    if (panelEl) {
-      panelEl.style.display = (panelEl.style.display === 'none') ? '' : 'none';
+  // Show/hide rows based on current era
+  function _refreshVisibility() {
+    const era = state.currentEra;
+    for (const b of ALL_BUILDINGS) {
+      if (rowEls[b.id]) {
+        rowEls[b.id].row.style.display = b.era <= era ? '' : 'none';
+      }
     }
   }
 
-  function close() {
-    if (panelEl) panelEl.style.display = 'none';
+  function toggle() {
+    if (panelEl) {
+      if (panelEl.style.display === 'none') {
+        _refreshVisibility();
+        panelEl.style.display = '';
+      } else {
+        panelEl.style.display = 'none';
+      }
+    }
   }
+
+  function close() { if (panelEl) panelEl.style.display = 'none'; }
 
   return { init, toggle, close };
 })();
@@ -115,24 +128,25 @@ const TownBuildingsPanel = (() => {
 // ----- Housing Panel -----
 const HousingPanel = (() => {
 
-  // Era 1 housing only at this step — later eras unlock on era advancement.
-  const HOUSING_LIST = [
-    { era: 1, id: 'hut', label: 'Hut' },
+  const ALL_HOUSING = [
+    { era: 1, id: 'hut',      label: 'Hut'            },
+    { era: 2, id: 'cottage',  label: 'Cottage'         },
+    { era: 3, id: 'lodging',  label: 'Lodging House'   },
+    { era: 4, id: 'barracks', label: 'Barracks Block'  },
+    { era: 5, id: 'habitat',  label: 'Habitat Module'  },
   ];
 
   const ownedCounts = {};
-  for (const h of HOUSING_LIST) ownedCounts[h.id] = 0;
+  for (const h of ALL_HOUSING) ownedCounts[h.id] = 0;
 
   let panelEl  = null;
   const rowEls = {};
 
-  // ----- init -----
   function init() {
     _buildTriggerButton();
     _buildPanel();
   }
 
-  // ----- _buildTriggerButton -----
   function _buildTriggerButton() {
     const btn = document.createElement('button');
     btn.className = 'hud-town-btn';
@@ -142,7 +156,6 @@ const HousingPanel = (() => {
     document.getElementById('hud-town-buttons').appendChild(btn);
   }
 
-  // ----- _buildPanel -----
   function _buildPanel() {
     panelEl = document.createElement('div');
     panelEl.id = 'overlay-housing';
@@ -159,10 +172,11 @@ const HousingPanel = (() => {
     closeBtn.addEventListener('click', close);
     panelEl.appendChild(closeBtn);
 
-    for (const h of HOUSING_LIST) {
+    for (const h of ALL_HOUSING) {
       const def = People.ERA_HOUSING[h.era];
       const row = document.createElement('div');
       row.className = 'overlay-building-row';
+      row.dataset.housingId = h.id;
 
       const nameEl = document.createElement('span');
       nameEl.className = 'overlay-building-name';
@@ -193,43 +207,50 @@ const HousingPanel = (() => {
 
       row.append(nameEl, capEl, goldEl, matEl, countEl, buyBtn);
       panelEl.appendChild(row);
-      rowEls[h.id] = { countEl };
+      rowEls[h.id] = { countEl, row };
     }
 
     document.getElementById('hud').appendChild(panelEl);
+    _refreshVisibility();
   }
 
-  // ----- _onBuy -----
   function _onBuy(h) {
     if (!People.buyHousing(h.era)) return;
     ownedCounts[h.id]++;
     rowEls[h.id].countEl.textContent = `Owned: ${ownedCounts[h.id]}`;
   }
 
-  // ----- toggle / close -----
-  function toggle() {
-    if (panelEl) {
-      panelEl.style.display = (panelEl.style.display === 'none') ? '' : 'none';
+  function _refreshVisibility() {
+    const era = state.currentEra;
+    for (const h of ALL_HOUSING) {
+      if (rowEls[h.id]) rowEls[h.id].row.style.display = h.era <= era ? '' : 'none';
     }
   }
 
-  function close() {
-    if (panelEl) panelEl.style.display = 'none';
+  function toggle() {
+    if (panelEl) {
+      if (panelEl.style.display === 'none') {
+        _refreshVisibility();
+        panelEl.style.display = '';
+      } else {
+        panelEl.style.display = 'none';
+      }
+    }
   }
+
+  function close() { if (panelEl) panelEl.style.display = 'none'; }
 
   return { init, toggle, close };
 })();
 
 // ----- Supply Overlay -----
-// Full-screen overlay: left panel (buildings) + SVG supply network.
-// Button is disabled in Era 1–2; active from Era 3 (era advancement handled in Step 17).
 const SupplyOverlay = (() => {
 
   const NS     = 'http://www.w3.org/2000/svg';
   const SVG_W  = 1580;
   const SVG_H  = 1080;
-  const TH_X   = 1340;  // Town Hall SVG x
-  const TH_Y   = 540;   // Town Hall SVG y
+  const TH_X   = 1340;
+  const TH_Y   = 540;
   const TH_R   = 36;
   const NODE_R = 22;
 
@@ -239,12 +260,10 @@ const SupplyOverlay = (() => {
   let hudBtn      = null;
   let visible     = false;
 
-  // Drag-to-connect state
   let dragging    = false;
   let previewLine = null;
   let svgRect     = null;
 
-  // ----- Node position: defense-zone grid cell → SVG coords -----
   function _towerPos(gx, gy) {
     return {
       x: 60 + (gx / 23) * 840,
@@ -252,7 +271,6 @@ const SupplyOverlay = (() => {
     };
   }
 
-  // ----- Init -----
   function init() {
     _buildHudButton();
     _buildPanel();
@@ -262,7 +280,7 @@ const SupplyOverlay = (() => {
     hudBtn = document.createElement('button');
     hudBtn.id = 'hud-supply-btn';
     hudBtn.textContent = 'Supply';
-    hudBtn.disabled = true;         // greyed until Era 3
+    hudBtn.disabled = true;
     hudBtn.title = 'Available from Era 3';
     hudBtn.addEventListener('click', toggle);
     document.getElementById('hud').appendChild(hudBtn);
@@ -273,22 +291,18 @@ const SupplyOverlay = (() => {
     overlayEl.id = 'overlay-supply';
     overlayEl.style.display = 'none';
 
-    // Close button
     const closeBtn = document.createElement('button');
     closeBtn.className = 'overlay-close';
     closeBtn.textContent = '\u00d7';
     closeBtn.addEventListener('click', close);
     overlayEl.appendChild(closeBtn);
 
-    // Left panel — buildings list + usage hints
     const leftPanel = document.createElement('div');
     leftPanel.id = 'supply-left-panel';
-
     const leftTitle = document.createElement('div');
     leftTitle.className = 'overlay-title';
-    leftTitle.textContent = 'Town Buildings';
+    leftTitle.textContent = 'Supply Network';
     leftPanel.appendChild(leftTitle);
-
     const hintEl = document.createElement('div');
     hintEl.className = 'supply-hint';
     hintEl.textContent =
@@ -296,15 +310,12 @@ const SupplyOverlay = (() => {
       'Left-click a line to cycle priority.\n' +
       'Right-click a line to disconnect.';
     leftPanel.appendChild(hintEl);
-
     overlayEl.appendChild(leftPanel);
 
-    // Stats bar (above SVG network)
     statsEl = document.createElement('div');
     statsEl.id = 'supply-stats';
     overlayEl.appendChild(statsEl);
 
-    // SVG — supply network
     svgEl = document.createElementNS(NS, 'svg');
     svgEl.id = 'supply-network-svg';
     svgEl.setAttribute('viewBox', `0 0 ${SVG_W} ${SVG_H}`);
@@ -318,47 +329,36 @@ const SupplyOverlay = (() => {
     document.getElementById('hud').appendChild(overlayEl);
   }
 
-  // ----- SVG rebuild — called on open and on every connection change -----
   function _rebuildSvg() {
     while (svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
 
     const towers   = Towers.getAll();
     const allConns = Supply.getAllConnections();
 
-    // Connection lines (rendered below nodes)
     for (const [towerId, conn] of allConns) {
       const tower = towers.find(t => t.id === towerId);
       if (!tower) continue;
       const tp = _towerPos(tower.gx, tower.gy);
 
       const line = document.createElementNS(NS, 'line');
-      line.setAttribute('x1', TH_X);  line.setAttribute('y1', TH_Y);
-      line.setAttribute('x2', tp.x);  line.setAttribute('y2', tp.y);
+      line.setAttribute('x1', TH_X); line.setAttribute('y1', TH_Y);
+      line.setAttribute('x2', tp.x); line.setAttribute('y2', tp.y);
       line.setAttribute('stroke', _priorityColor(conn.priority));
       line.setAttribute('stroke-width', '3');
       line.setAttribute('stroke-linecap', 'round');
       line.style.cursor = 'pointer';
-
-      // Left-click → cycle priority
       line.addEventListener('click', e => {
         e.stopPropagation();
         Supply.cyclePriority(towerId);
-        _rebuildSvg();
-        _refreshStats();
+        _rebuildSvg(); _refreshStats();
       });
-
-      // Right-click → disconnect
       line.addEventListener('contextmenu', e => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         Supply.disconnect(towerId);
-        _rebuildSvg();
-        _refreshStats();
+        _rebuildSvg(); _refreshStats();
       });
-
       svgEl.appendChild(line);
 
-      // Priority label at line midpoint
       const lbl = document.createElementNS(NS, 'text');
       lbl.setAttribute('x', (TH_X + tp.x) / 2);
       lbl.setAttribute('y', (TH_Y + tp.y) / 2 - 6);
@@ -371,16 +371,13 @@ const SupplyOverlay = (() => {
       svgEl.appendChild(lbl);
     }
 
-    // Tower nodes
     for (const tower of towers) {
       const tp   = _towerPos(tower.gx, tower.gy);
       const conn = Supply.getConnection(tower.id);
 
-      // Supply health ring (colored by health level)
       if (conn) {
         const ring = document.createElementNS(NS, 'circle');
-        ring.setAttribute('cx', tp.x);
-        ring.setAttribute('cy', tp.y);
+        ring.setAttribute('cx', tp.x); ring.setAttribute('cy', tp.y);
         ring.setAttribute('r', NODE_R + 5);
         ring.setAttribute('fill', 'none');
         ring.setAttribute('stroke', _supplyColor(conn.supplyHealth));
@@ -390,28 +387,21 @@ const SupplyOverlay = (() => {
       }
 
       const circle = document.createElementNS(NS, 'circle');
-      circle.setAttribute('cx', tp.x);
-      circle.setAttribute('cy', tp.y);
+      circle.setAttribute('cx', tp.x); circle.setAttribute('cy', tp.y);
       circle.setAttribute('r', NODE_R);
       circle.setAttribute('fill', conn ? 'rgba(70,45,18,0.95)' : 'rgba(28,18,8,0.9)');
       circle.setAttribute('stroke', conn ? 'rgba(210,160,60,0.9)' : 'rgba(100,80,40,0.4)');
       circle.setAttribute('stroke-width', '2');
-
-      // mouseup on tower node → finish drag connection
       circle.addEventListener('mouseup', e => {
         if (!dragging) return;
         e.stopPropagation();
         Supply.connect(tower.id);
-        _stopDrag();
-        _rebuildSvg();
-        _refreshStats();
+        _stopDrag(); _rebuildSvg(); _refreshStats();
       });
-
       svgEl.appendChild(circle);
 
       const tlbl = document.createElementNS(NS, 'text');
-      tlbl.setAttribute('x', tp.x);
-      tlbl.setAttribute('y', tp.y + 4);
+      tlbl.setAttribute('x', tp.x); tlbl.setAttribute('y', tp.y + 4);
       tlbl.setAttribute('text-anchor', 'middle');
       tlbl.setAttribute('fill', 'rgba(210,180,140,0.9)');
       tlbl.setAttribute('font-size', '11');
@@ -421,10 +411,8 @@ const SupplyOverlay = (() => {
       svgEl.appendChild(tlbl);
     }
 
-    // Town Hall node (topmost)
     const thCircle = document.createElementNS(NS, 'circle');
-    thCircle.setAttribute('cx', TH_X);
-    thCircle.setAttribute('cy', TH_Y);
+    thCircle.setAttribute('cx', TH_X); thCircle.setAttribute('cy', TH_Y);
     thCircle.setAttribute('r', TH_R);
     thCircle.setAttribute('fill', 'rgba(85,58,22,0.95)');
     thCircle.setAttribute('stroke', 'rgba(220,185,80,0.95)');
@@ -434,8 +422,7 @@ const SupplyOverlay = (() => {
     svgEl.appendChild(thCircle);
 
     const thText = document.createElementNS(NS, 'text');
-    thText.setAttribute('x', TH_X);
-    thText.setAttribute('y', TH_Y + 5);
+    thText.setAttribute('x', TH_X); thText.setAttribute('y', TH_Y + 5);
     thText.setAttribute('text-anchor', 'middle');
     thText.setAttribute('fill', 'rgba(220,185,80,0.95)');
     thText.setAttribute('font-size', '13');
@@ -447,8 +434,7 @@ const SupplyOverlay = (() => {
 
     if (towers.length === 0) {
       const noTowers = document.createElementNS(NS, 'text');
-      noTowers.setAttribute('x', SVG_W / 2 - 120);
-      noTowers.setAttribute('y', SVG_H / 2);
+      noTowers.setAttribute('x', SVG_W / 2 - 120); noTowers.setAttribute('y', SVG_H / 2);
       noTowers.setAttribute('fill', 'rgba(180,140,80,0.35)');
       noTowers.setAttribute('font-size', '16');
       noTowers.setAttribute('font-family', 'monospace');
@@ -458,19 +444,14 @@ const SupplyOverlay = (() => {
     }
   }
 
-  // ----- Drag handlers -----
-
   function _onThMouseDown(e) {
     e.preventDefault();
     dragging = true;
     svgRect  = svgEl.getBoundingClientRect();
     const { mx, my } = _svgPos(e);
-
     previewLine = document.createElementNS(NS, 'line');
-    previewLine.setAttribute('x1', TH_X);
-    previewLine.setAttribute('y1', TH_Y);
-    previewLine.setAttribute('x2', mx);
-    previewLine.setAttribute('y2', my);
+    previewLine.setAttribute('x1', TH_X); previewLine.setAttribute('y1', TH_Y);
+    previewLine.setAttribute('x2', mx);   previewLine.setAttribute('y2', my);
     previewLine.setAttribute('stroke', 'rgba(200,180,100,0.55)');
     previewLine.setAttribute('stroke-width', '2');
     previewLine.setAttribute('stroke-dasharray', '8 4');
@@ -485,9 +466,7 @@ const SupplyOverlay = (() => {
     previewLine.setAttribute('y2', my);
   }
 
-  function _onSvgMouseUp() {
-    if (dragging) _stopDrag();
-  }
+  function _onSvgMouseUp() { if (dragging) _stopDrag(); }
 
   function _stopDrag() {
     dragging = false;
@@ -502,8 +481,6 @@ const SupplyOverlay = (() => {
     };
   }
 
-  // ----- Colour helpers -----
-
   function _priorityColor(p) {
     return { low: '#8888bb', medium: '#ccaa33', high: '#44cc66' }[p] ?? '#888';
   }
@@ -515,8 +492,6 @@ const SupplyOverlay = (() => {
     return '#555555';
   }
 
-  // ----- Stats bar -----
-
   function _refreshStats() {
     if (!statsEl) return;
     const prod = Supply.getTotalProduction();
@@ -526,12 +501,10 @@ const SupplyOverlay = (() => {
       : 'Supply network \u2014 active from Era 3';
   }
 
-  // ----- Public -----
-
   function open() {
     visible = true;
     overlayEl.style.display = '';
-    svgRect = null;  // force rect recalculation after layout
+    svgRect = null;
     _rebuildSvg();
     _refreshStats();
   }
@@ -542,14 +515,9 @@ const SupplyOverlay = (() => {
     overlayEl.style.display = 'none';
   }
 
-  function toggle() {
-    if (visible) close(); else open();
-  }
+  function toggle() { if (visible) close(); else open(); }
 
-  // refresh() — call when towers change while overlay is open.
-  function refresh() {
-    if (visible) { _rebuildSvg(); _refreshStats(); }
-  }
+  function refresh() { if (visible) { _rebuildSvg(); _refreshStats(); } }
 
   return { init, open, close, toggle, refresh };
 })();

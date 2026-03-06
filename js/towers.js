@@ -4,19 +4,35 @@
 
 const Towers = (() => {
 
-  // ----- Tower definitions -----
-  // rangeTiles: attack radius in grid tiles (1 tile = 40px)
-  // attackSpeed: seconds between attacks
-  // aoe: false = single-target, true = damages all enemies in range
-  // cost: resource amounts deducted on placement
+  // ----- Tower definitions (all eras) -----
   const DEFS = {
-    club:        { era:1, damage:20, attackSpeed:1.0, rangeTiles:2, aoe:false, spriteKey:'clubMan',  label:'Club',         cost:{ bone: 5, wood:  3 }, peopleRequired:1 },
-    rockThrower: { era:1, damage:14, attackSpeed:2.2, rangeTiles:4, aoe:false, spriteKey:'stoneMan', label:'Rock Thrower', cost:{ bone: 8, wood:  5 }, peopleRequired:1 },
-    spear:       { era:1, damage:30, attackSpeed:2.8, rangeTiles:6, aoe:false, spriteKey:'spearMan', label:'Spear',        cost:{ bone:10, wood:  8 }, peopleRequired:1 },
+    // Era 1 — Prehistoric
+    club:        { era:1, damage:20, attackSpeed:1.0, rangeTiles:2, aoe:false, spriteKey:'clubMan',        label:'Club',         cost:{ bone: 5, wood:  3 }, peopleRequired:1 },
+    rockThrower: { era:1, damage:14, attackSpeed:2.2, rangeTiles:4, aoe:false, spriteKey:'stoneMan',       label:'Rock Thrower', cost:{ bone: 8, wood:  5 }, peopleRequired:1 },
+    spear:       { era:1, damage:30, attackSpeed:2.8, rangeTiles:6, aoe:false, spriteKey:'spearMan',       label:'Spear',        cost:{ bone:10, wood:  8 }, peopleRequired:1 },
+
+    // Era 2 — Medieval
+    sword:       { era:2, damage:35, attackSpeed:0.9, rangeTiles:2, aoe:false, spriteKey:'swordMan',       label:'Sword',        cost:{ stone: 8, iron:  6 }, peopleRequired:1 },
+    cavalry:     { era:2, damage:50, attackSpeed:1.5, rangeTiles:3, aoe:false, spriteKey:'horseMan',       label:'Cavalry',      cost:{ stone:12, iron:  8 }, peopleRequired:1 },
+    crossbow:    { era:2, damage:22, attackSpeed:1.8, rangeTiles:6, aoe:false, spriteKey:'crossbowMan',    label:'Crossbow',     cost:{ stone:10, iron:  7 }, peopleRequired:1 },
+
+    // Era 3 — Pirate Age
+    cutlass:     { era:3, damage:55, attackSpeed:0.8, rangeTiles:2, aoe:false, spriteKey:'cutlassMan',     label:'Cutlass',      cost:{ timber:10, gunpowder: 6 }, peopleRequired:1 },
+    blunderbuss: { era:3, damage:45, attackSpeed:2.2, rangeTiles:5, aoe:false, spriteKey:'blunderbussMan', label:'Blunderbuss',  cost:{ timber:12, gunpowder: 8 }, peopleRequired:1 },
+    mortar:      { era:3, damage:90, attackSpeed:3.5, rangeTiles:7, aoe:true,  spriteKey:'cutlassMan',     label:'Mortar',       cost:{ timber:18, gunpowder:14 }, peopleRequired:2 },
+
+    // Era 4 — World War II
+    rifleman:    { era:4, damage:65, attackSpeed:1.2, rangeTiles:7, aoe:false, spriteKey:'rifleman',       label:'Rifleman',     cost:{ steel:12, oil: 8 }, peopleRequired:1 },
+    machineGun:  { era:4, damage:40, attackSpeed:0.4, rangeTiles:5, aoe:false, spriteKey:'machineGun',     label:'Machine Gun',  cost:{ steel:18, oil:12 }, peopleRequired:2 },
+    artillery:   { era:4, damage:160,attackSpeed:4.0, rangeTiles:9, aoe:true,  spriteKey:'artillery',      label:'Artillery',    cost:{ steel:25, oil:18 }, peopleRequired:2 },
+
+    // Era 5 — Sci-Fi
+    laserTurret: { era:5, damage:120, attackSpeed:0.5, rangeTiles:8,  aoe:false, spriteKey:'laserTurret',  label:'Laser Turret', cost:{ alloy:14, plasma:10 }, peopleRequired:1 },
+    railgun:     { era:5, damage:320, attackSpeed:3.0, rangeTiles:12, aoe:false, spriteKey:'railgun',      label:'Railgun',      cost:{ alloy:20, plasma:15 }, peopleRequired:2 },
+    nukeStation: { era:5, damage:550, attackSpeed:8.0, rangeTiles:10, aoe:true,  spriteKey:'nukeStation',  label:'Nuke Station', cost:{ alloy:30, plasma:22 }, peopleRequired:3 },
   };
 
   let nextTowerId = 0;
-
   let towers = [];
 
   // ----- Tower class -----
@@ -37,43 +53,41 @@ const Towers = (() => {
       this.label          = def.label;
       this.peopleRequired = def.peopleRequired ?? 1;
 
-      // Center pixel position used for range checks
       const center = Map.gridToPixel(gx, gy);
       this.cx = center.x;
       this.cy = center.y;
 
-      // Animation state
       this.frameIndex   = 0;
       this.frameElapsed = 0;
       this.attacking    = false;
-
-      // attackTimer: seconds until next shot is allowed (starts at 0 so towers fire immediately)
-      this.attackTimer = 0;
-      // attackFlash: seconds remaining on the muzzle-flash visual (decays to 0)
-      this.attackFlash = 0;
+      this.attackTimer  = 0;
+      this.attackFlash  = 0;
     }
 
-    // staffingRatio: 0.0 (dormant) – 1.0 (fully staffed)
     get staffingRatio() {
       const assigned = People.getAssigned(this.id);
       return this.peopleRequired > 0 ? Math.min(1, assigned / this.peopleRequired) : 1;
     }
 
-    // ----- update(dt, enemies) -----
-    // Called each frame. Handles cooldown, targeting, and animation.
-    update(dt, enemies) {
-      // Dormant — no people assigned; do nothing
-      if (this.staffingRatio === 0) {
-        this.attacking = false;
-        return;
-      }
+    // Supply multiplier: Era 1-2 = full power, Era 3+ = supply-health based
+    _supplyMult() {
+      if (DEFS[this.type].era < 3) return { dmgMult: 1.0, speedPenalty: 0, dormant: false };
+      const conn = Supply.getConnection(this.id);
+      const h    = conn ? conn.supplyHealth : 0;
+      return Supply.getSupplyMultiplier(h);
+    }
 
-      // Decay attack flash visual
+    update(dt, enemies) {
+      if (this.staffingRatio === 0) { this.attacking = false; return; }
+
+      // Check supply dormancy (Era 3+ only)
+      const sm = this._supplyMult();
+      if (sm.dormant) { this.attacking = false; return; }
+
       if (this.attackFlash > 0) {
         this.attackFlash = Math.max(0, this.attackFlash - dt / 1000);
       }
 
-      // Advance attack animation frames while attacking
       if (this.attacking) {
         const animEntry = Assets.getAnim(this.spriteKey, 'attack');
         if (animEntry) {
@@ -83,7 +97,6 @@ const Towers = (() => {
             this.frameIndex++;
             this.frameElapsed -= frameDur;
           }
-          // Determine total frame count (sheet uses meta.frames; sequences use images.length)
           const frameCount = animEntry.meta.type === 'sheet'
             ? animEntry.meta.frames
             : (animEntry.images?.length ?? 1);
@@ -91,23 +104,19 @@ const Towers = (() => {
         }
       }
 
-      // Count down attack cooldown
       this.attackTimer -= dt / 1000;
       if (this.attackTimer > 0) return;
 
-      // Choose targeting mode
       if (this.aoe) {
-        this._fireAoE(enemies);
+        this._fireAoE(enemies, sm);
       } else {
-        this._fireSingleTarget(enemies);
+        this._fireSingleTarget(enemies, sm);
       }
     }
 
-    // ----- Single-target: nearest enemy in range -----
-    _fireSingleTarget(enemies) {
+    _fireSingleTarget(enemies, sm) {
       let nearest     = null;
       let nearestDist = Infinity;
-
       for (const e of enemies) {
         if (e.dead || e.reached) continue;
         const pos  = e.getPosition();
@@ -119,42 +128,28 @@ const Towers = (() => {
           nearestDist = dist;
         }
       }
-
-      if (!nearest) {
-        this.attacking = false;
-        return;
-      }
-
-      nearest.takeDamage(this.damage * this.staffingRatio);
-      this._onFire();
+      if (!nearest) { this.attacking = false; return; }
+      nearest.takeDamage(this.damage * this.staffingRatio * sm.dmgMult);
+      this._onFire(sm.speedPenalty);
     }
 
-    // ----- AoE: all enemies within range -----
-    // Interface prepared for future era towers; no Era 1 tower uses this path.
-    _fireAoE(enemies) {
+    _fireAoE(enemies, sm) {
       let hit = false;
-
       for (const e of enemies) {
         if (e.dead || e.reached) continue;
         const pos = e.getPosition();
         const dx  = pos.x - this.cx;
         const dy  = pos.y - this.cy;
         if (Math.sqrt(dx * dx + dy * dy) <= this.rangePx) {
-          e.takeDamage(this.damage * this.staffingRatio);
+          e.takeDamage(this.damage * this.staffingRatio * sm.dmgMult);
           hit = true;
         }
       }
-
-      if (hit) {
-        this._onFire();
-      } else {
-        this.attacking = false;
-      }
+      if (hit) { this._onFire(sm.speedPenalty); } else { this.attacking = false; }
     }
 
-    // ----- Shared post-fire state -----
-    _onFire() {
-      this.attackTimer  = this.attackSpeed;
+    _onFire(speedPenalty = 0) {
+      this.attackTimer  = this.attackSpeed + speedPenalty;
       this.attackFlash  = 0.15;
       this.attacking    = true;
       this.frameIndex   = 0;
@@ -163,16 +158,12 @@ const Towers = (() => {
   }
 
   // ----- Module-level update -----
-  // Called each frame from main.js; drives all placed towers.
   function update(dt) {
     const enemies = Enemies.getAll();
-    for (const t of towers) {
-      t.update(dt, enemies);
-    }
+    for (const t of towers) t.update(dt, enemies);
   }
 
   // ----- Placement validation -----
-  // Valid: defense zone, adjacent to path, not on path, not occupied.
   function isValid(gx, gy) {
     const cell = Map.getCell(gx, gy);
     if (!cell) return false;
@@ -181,8 +172,6 @@ const Towers = (() => {
     return Map.isAdjacentToPath(gx, gy);
   }
 
-  // place(type, gx, gy) — place a tower on the grid.
-  // Returns: 'ok' | 'invalid' | 'insufficient'
   function place(type, gx, gy) {
     if (!isValid(gx, gy)) return 'invalid';
     const cost = DEFS[type]?.cost ?? {};
@@ -193,14 +182,9 @@ const Towers = (() => {
     return 'ok';
   }
 
-  function getAll() { return towers; }
+  function getAll()  { return towers; }
+  function getAt(gx, gy) { return towers.find(t => t.gx === gx && t.gy === gy) ?? null; }
 
-  // getAt(gx, gy) — returns the tower at the given grid cell, or null.
-  function getAt(gx, gy) {
-    return towers.find(t => t.gx === gx && t.gy === gy) ?? null;
-  }
-
-  // demolish(tower) — returns assigned people to pool, removes tower, frees cell.
   function demolish(tower) {
     const count = People.getAssigned(tower.id);
     for (let i = 0; i < count; i++) People.removeFromTower(tower.id);

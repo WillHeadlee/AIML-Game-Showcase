@@ -5,7 +5,6 @@
 // ----- People Arrival Popup -----
 const PeopleArrivalPopup = (() => {
 
-  // Arrival count range per era (from design doc).
   const ERA_ARRIVAL_RANGE = {
     1: [2, 4],
     2: [3, 6],
@@ -17,8 +16,6 @@ const PeopleArrivalPopup = (() => {
   let popupEl        = null;
   let onDoneCallback = null;
 
-  // show(era, onDone) — generates a random arrival count and displays the popup.
-  // onDone is called when the player clicks Done.
   function show(era, onDone) {
     onDoneCallback = onDone;
     const [lo, hi] = ERA_ARRIVAL_RANGE[era] ?? [2, 4];
@@ -26,31 +23,26 @@ const PeopleArrivalPopup = (() => {
     _buildPopup(arrivalCount);
   }
 
-  // ----- _buildPopup -----
   function _buildPopup(arrivalCount) {
     if (popupEl) popupEl.remove();
 
     popupEl = document.createElement('div');
     popupEl.id = 'popup-arrival';
 
-    // Header
     const header = document.createElement('div');
     header.className = 'popup-title';
     const noun = arrivalCount === 1 ? 'person wants' : 'people want';
     header.textContent = `New Arrivals \u2014 ${arrivalCount} ${noun} to join your Town`;
     popupEl.appendChild(header);
 
-    // Housing info line (refreshed after each decision)
     const housingInfo = document.createElement('div');
     housingInfo.className = 'popup-housing-info';
     _refreshHousingInfo(housingInfo);
     popupEl.appendChild(housingInfo);
 
-    // Person list
     const listEl = document.createElement('div');
     listEl.className = 'popup-person-list';
 
-    // Done button — created early so onRowResolved can reference it
     const doneBtn = document.createElement('button');
     doneBtn.className = 'popup-btn popup-btn-done';
     doneBtn.textContent = 'Done';
@@ -63,10 +55,7 @@ const PeopleArrivalPopup = (() => {
       pendingCount--;
       _refreshHousingInfo(housingInfo);
       _refreshAcceptButtons(listEl);
-      // Enable Done when all rows resolved OR housing is full (remaining can't be accepted)
-      if (pendingCount === 0 || !People.canAccept()) {
-        doneBtn.disabled = false;
-      }
+      if (pendingCount === 0 || !People.canAccept()) doneBtn.disabled = false;
     }
 
     for (let i = 0; i < arrivalCount; i++) {
@@ -112,15 +101,11 @@ const PeopleArrivalPopup = (() => {
 
     popupEl.appendChild(listEl);
     popupEl.appendChild(doneBtn);
-
     document.getElementById('hud').appendChild(popupEl);
 
-    // Initial state — if housing is already full, enable Done immediately
     _refreshAcceptButtons(listEl);
     if (!People.canAccept()) doneBtn.disabled = false;
   }
-
-  // ----- Helpers -----
 
   function _refreshHousingInfo(el) {
     const used  = People.getTotalPeople();
@@ -130,7 +115,6 @@ const PeopleArrivalPopup = (() => {
       `Housing: ${used} / ${cap}  \u00b7  ${avail} slot${avail === 1 ? '' : 's'} available`;
   }
 
-  // Disable all undecided Accept buttons when housing is full.
   function _refreshAcceptButtons(listEl) {
     const canStill = People.canAccept();
     for (const row of listEl.querySelectorAll('.popup-person-row')) {
@@ -145,6 +129,100 @@ const PeopleArrivalPopup = (() => {
   function _onDone() {
     if (popupEl) { popupEl.remove(); popupEl = null; }
     if (onDoneCallback) { onDoneCallback(); onDoneCallback = null; }
+  }
+
+  return { show };
+})();
+
+// ----- Era Advancement Overlay -----
+const EraAdvancementOverlay = (() => {
+
+  const ERA_NAMES = {
+    2: 'Medieval Age',
+    3: 'Pirate Age',
+    4: 'World War II',
+    5: 'Sci-Fi Era',
+  };
+
+  const ERA_UNLOCKS = {
+    2: [
+      'Towers: Sword, Cavalry, Crossbow',
+      'Enemies: Witch, Vampire, Ghost',
+      'Barricade: Stone Wall',
+      'Buildings: Stone Quarry, Iron Mine',
+      'Housing: Cottage (+4 cap)',
+      'Ability: Trebuchet (AoE click)',
+    ],
+    3: [
+      'Towers: Cutlass, Blunderbuss, Mortar (AoE)',
+      'Enemies: Sword Pirate, Flintlock Pirate, Bomb Pirate',
+      'Barricade: Barrel Trap',
+      'Buildings: Timber Mill, Powder Mill',
+      'Housing: Lodging House (+6 cap)',
+      'Supply Network activated',
+      'Ability: Cannon (click target + splash)',
+    ],
+    4: [
+      'Towers: Rifleman, Machine Gun, Artillery (AoE)',
+      'Enemies: Grunt Zombie, Vombie, Necro Zombie',
+      'Barricade: Sandbag',
+      'Buildings: Steel Foundry, Oil Refinery',
+      'Housing: Barracks Block (+8 cap)',
+      'Ability: Fighter Jets (horizontal strike)',
+    ],
+    5: [
+      'Towers: Laser Turret, Railgun, Nuke Station (AoE)',
+      'Enemies: Laser Alien, Fortnite Bart, Flying Saucer',
+      'Barricade: Force Field',
+      'Buildings: Alloy Forge, Plasma Generator',
+      'Housing: Habitat Module (+12 cap)',
+      'Ability: Nuclear Bomb (all screen)',
+    ],
+  };
+
+  let overlayEl = null;
+
+  function show(newEra, onContinue) {
+    if (overlayEl) overlayEl.remove();
+
+    overlayEl = document.createElement('div');
+    overlayEl.id = 'popup-era-advance';
+
+    const title = document.createElement('div');
+    title.className = 'popup-title';
+    title.textContent = `Era Complete!`;
+    overlayEl.appendChild(title);
+
+    const subtitle = document.createElement('div');
+    subtitle.className = 'popup-era-subtitle';
+    subtitle.textContent = `Entering ${ERA_NAMES[newEra] ?? `Era ${newEra}`}`;
+    overlayEl.appendChild(subtitle);
+
+    const unlockTitle = document.createElement('div');
+    unlockTitle.className = 'popup-housing-info';
+    unlockTitle.textContent = 'Unlocked:';
+    overlayEl.appendChild(unlockTitle);
+
+    const list = document.createElement('ul');
+    list.className = 'popup-era-unlocks';
+    for (const item of ERA_UNLOCKS[newEra] ?? []) {
+      const li = document.createElement('li');
+      li.textContent = item;
+      list.appendChild(li);
+    }
+    overlayEl.appendChild(list);
+
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'popup-btn popup-btn-done';
+    continueBtn.textContent = 'Continue';
+    continueBtn.addEventListener('click', () => {
+      overlayEl.remove();
+      overlayEl = null;
+      if (onContinue) onContinue();
+    });
+    overlayEl.appendChild(continueBtn);
+
+    document.getElementById('hud').appendChild(overlayEl);
   }
 
   return { show };

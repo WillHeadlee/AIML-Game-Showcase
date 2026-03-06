@@ -9,13 +9,9 @@ const state = {
   phase:       'prep',   // 'prep' | 'wave' | 'gameover'
 };
 
-// ----- Canvas / context -----
 let canvas, ctx;
-
-// ----- Timing -----
 let lastTimestamp = 0;
-
-let assetsReady = false;
+let assetsReady   = false;
 
 // ----- Init -----
 function init() {
@@ -29,25 +25,45 @@ function init() {
   HousingPanel.init();
   SupplyOverlay.init();
 
-  // Event bus smoke test
   Events.on('test', d => console.log('[Events] received:', d));
   Events.emit('test', { message: 'Event bus OK', state });
 
-  // Wave complete — advance counter, show people arrival popup, then enter prep
+  // Wave complete — advance counter or era
   Events.on('wave:complete', () => {
     if (state.currentWave >= 5) {
+      // Era complete
       Events.emit('era:advance', { era: state.currentEra });
-      console.log(`[Main] era:advance — era ${state.currentEra} complete`);
+
+      if (state.currentEra >= 5) {
+        // Win condition
+        state.phase = 'gameover';
+        UI.update(state);
+        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+        return;
+      }
+
+      state.currentEra++;
       state.currentWave = 1;
-      // Actual era transition implemented in a later step
+      Town.reset(state.currentEra);
+      Abilities.reset();
+      Barricades.setEra(state.currentEra);
+
+      // Load new era assets then show advancement overlay
+      Assets.loadEra(state.currentEra).then(() => {
+        EraAdvancementOverlay.show(state.currentEra, () => {
+          PeopleArrivalPopup.show(state.currentEra, () => {
+            state.phase = 'prep';
+            UI.update(state);
+          });
+        });
+      });
     } else {
       state.currentWave++;
+      PeopleArrivalPopup.show(state.currentEra, () => {
+        state.phase = 'prep';
+        UI.update(state);
+      });
     }
-    // Show arrival popup; prep phase begins only after the player clicks Done
-    PeopleArrivalPopup.show(state.currentEra, () => {
-      state.phase = 'prep';
-      UI.update(state);
-    });
   });
 
   // Enemy killed — award gold reward
@@ -71,7 +87,7 @@ function init() {
 
 // ----- Main loop -----
 function loop(timestamp) {
-  const delta = Math.min(timestamp - lastTimestamp, 100); // clamp large gaps
+  const delta = Math.min(timestamp - lastTimestamp, 100);
   lastTimestamp = timestamp;
 
   update(delta);
@@ -90,6 +106,7 @@ function update(delta) {
   Barricades.update(delta);
   Towers.update(delta);
   Supply.update();
+  Abilities.update(delta);
 }
 
 // ----- Render -----
@@ -103,9 +120,9 @@ function render() {
   Renderer.drawTowers();
   Renderer.drawBuildHighlight();
   Renderer.drawEnemies();
-  Renderer.drawWall(); // drawn last so it overlaps sprites crossing the wall
+  Renderer.drawWall();
 
-  UI.renderHUD(); // keeps town health bar in sync every frame
+  UI.renderHUD();
 }
 
 // ----- Boot -----

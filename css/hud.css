@@ -12,7 +12,7 @@
   z-index: 10;
 }
 
-/* ----- Town health bar — top center, prominent ----- */
+/* ----- Town health bar — top center ----- */
 #hud-town-health {
   position: absolute;
   top: 14px;
@@ -81,7 +81,7 @@
   pointer-events: none;
 }
 
-/* ----- Population counter — top left, below era/wave label ----- */
+/* ----- Population counter — top left, below era/wave ----- */
 #hud-population {
   position: absolute;
   top: 56px;
@@ -95,7 +95,29 @@
   pointer-events: none;
 }
 
-/* ----- Stub town upgrade/repair buttons — prep phase only, below health bar ----- */
+/* ----- Low supply warning — Step 15 ----- */
+#hud-low-supply-warn {
+  position: absolute;
+  bottom: 112px;
+  left: 48px;
+  padding: 8px 18px;
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ff8080;
+  background: rgba(80, 10, 10, 0.85);
+  border: 1px solid rgba(200, 60, 60, 0.6);
+  border-radius: 4px;
+  pointer-events: none;
+  animation: supply-warn-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes supply-warn-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+
+/* ----- Town upgrade/repair buttons — prep phase, below health bar ----- */
 #hud-town-buttons {
   position: absolute;
   top: 70px;
@@ -120,14 +142,14 @@
   border: 1px solid var(--era-highlight, #CD853F);
   border-radius: 3px;
   cursor: pointer;
-  opacity: 0.6;
+  opacity: 0.85;
+  transition: filter 0.1s;
 }
 
-.hud-town-btn:disabled {
-  cursor: not-allowed;
-}
+.hud-town-btn:hover { filter: brightness(1.25); }
+.hud-town-btn:disabled { cursor: not-allowed; opacity: 0.4; }
 
-/* ----- Resource display — top right, always visible ----- */
+/* ----- Resource display — top right ----- */
 #hud-resources {
   position: absolute;
   top: 14px;
@@ -151,18 +173,15 @@
   100% { color: var(--era-text, #D2B48C); text-shadow: 0 1px 5px rgba(0, 0, 0, 0.95); }
 }
 
-#hud-resources.flash {
-  animation: resource-flash 0.45s ease-out forwards;
-}
+#hud-resources.flash { animation: resource-flash 0.45s ease-out forwards; }
 
-/* ----- Build Mode toggle button — prep phase, top center below stub buttons ----- */
+/* ----- Build Mode toggle ----- */
 #hud-build-mode-btn {
   position: absolute;
   top: 110px;
   left: 50%;
   transform: translateX(-50%);
   pointer-events: auto;
-
   padding: 7px 24px;
   font-family: 'Cinzel', 'Georgia', serif;
   font-size: 13px;
@@ -188,23 +207,26 @@
   box-shadow: 0 0 10px rgba(205, 133, 63, 0.6);
 }
 
-/* ----- Tower type selector — visible only in build mode ----- */
+/* ----- Tower type selector ----- */
 #hud-tower-selector {
   position: absolute;
   top: 150px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  max-width: 900px;
   pointer-events: auto;
 }
 
 .hud-tower-type-btn {
-  padding: 6px 16px;
+  padding: 5px 14px;
   font-family: 'Cinzel', 'Georgia', serif;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: var(--era-text, #D2B48C);
   background: linear-gradient(180deg,
     color-mix(in srgb, var(--era-primary, #8B4513) 55%, #000) 0%,
@@ -229,60 +251,43 @@
   bottom: 48px;
   right: 48px;
   pointer-events: auto;
-
   padding: 14px 36px;
   font-family: 'Cinzel', 'Georgia', serif;
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.1em;
   color: var(--era-text, #D2B48C);
-
   background: linear-gradient(180deg,
     color-mix(in srgb, var(--era-primary, #8B4513) 80%, #000) 0%,
     color-mix(in srgb, var(--era-primary, #8B4513) 50%, #000) 100%
   );
   border: 2px solid var(--era-highlight, #CD853F);
   border-radius: 4px;
-  box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.8),
-    inset 0 1px 0 rgba(255, 220, 140, 0.2);
-
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 220, 140, 0.2);
   cursor: pointer;
   transition: filter 0.12s ease, box-shadow 0.12s ease, transform 0.08s ease;
 }
 
 #hud-start-wave:hover:not(:disabled) {
   filter: brightness(1.25);
-  box-shadow:
-    0 4px 20px rgba(205, 133, 63, 0.45),
-    inset 0 1px 0 rgba(255, 220, 140, 0.35);
+  box-shadow: 0 4px 20px rgba(205, 133, 63, 0.45), inset 0 1px 0 rgba(255, 220, 140, 0.35);
 }
 
-#hud-start-wave:active:not(:disabled) {
-  filter: brightness(0.9);
-  transform: translateY(1px);
-}
+#hud-start-wave:active:not(:disabled) { filter: brightness(0.9); transform: translateY(1px); }
+#hud-start-wave:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
 
-#hud-start-wave:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* ----- Supply overlay toggle button — bottom left, always visible ----- */
+/* ----- Supply overlay toggle button — bottom left ----- */
 #hud-supply-btn {
   position: absolute;
   bottom: 48px;
   left: 48px;
   pointer-events: auto;
-
   padding: 10px 28px;
   font-family: 'Cinzel', 'Georgia', serif;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--era-text, #D2B48C);
-
   background: linear-gradient(180deg,
     color-mix(in srgb, var(--era-primary, #8B4513) 75%, #000) 0%,
     color-mix(in srgb, var(--era-primary, #8B4513) 45%, #000) 100%
@@ -294,11 +299,64 @@
   transition: filter 0.12s ease;
 }
 
-#hud-supply-btn:hover:not(:disabled) {
-  filter: brightness(1.25);
+#hud-supply-btn:hover:not(:disabled) { filter: brightness(1.25); }
+#hud-supply-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ----- Ability button — Step 16 — bottom center ----- */
+#hud-ability-btn {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  pointer-events: auto;
+  background: rgba(10, 6, 2, 0.88);
+  border: 1px solid rgba(180, 130, 50, 0.5);
+  border-radius: 6px;
+  padding: 10px 14px 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-align: center;
 }
 
-#hud-supply-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
+#hud-ability-btn.ready {
+  border-color: #d4a820;
+  box-shadow: 0 0 18px rgba(212, 168, 32, 0.5);
+  animation: ability-pulse 1.4s ease-in-out infinite;
+}
+
+#hud-ability-btn.targeting {
+  border-color: #40aaff;
+  box-shadow: 0 0 18px rgba(64, 170, 255, 0.6);
+  cursor: crosshair;
+}
+
+@keyframes ability-pulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(212, 168, 32, 0.4); }
+  50%       { box-shadow: 0 0 28px rgba(212, 168, 32, 0.75); }
+}
+
+.ability-btn-label {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--era-text, #D2B48C);
+  margin-bottom: 6px;
+}
+
+.ability-btn-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(180, 130, 50, 0.35);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ability-btn-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b3a00, #d4a820);
+  border-radius: 1px;
+  transition: width 0.3s linear;
 }

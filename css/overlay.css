@@ -6,9 +6,9 @@
 #overlay-buildings {
   position: absolute;
   top: 50%;
-  left: 30%;                /* center over the defense zone */
+  left: 30%;
   transform: translate(-50%, -50%);
-  width: 440px;
+  width: 460px;
   background: rgba(10, 6, 2, 0.94);
   border: 1px solid var(--era-highlight, #CD853F);
   border-radius: 6px;
@@ -19,7 +19,6 @@
 }
 
 /* ----- Shared overlay components ----- */
-
 .overlay-title {
   font-family: 'Cinzel', 'Georgia', serif;
   font-size: 17px;
@@ -44,11 +43,9 @@
   opacity: 0.6;
   transition: opacity 0.1s ease;
 }
-
 .overlay-close:hover { opacity: 1; }
 
 /* ----- Building list rows ----- */
-
 .overlay-building-row {
   display: flex;
   align-items: center;
@@ -56,11 +53,7 @@
   padding: 10px 0;
   border-bottom: 1px solid rgba(180, 130, 50, 0.18);
 }
-
-.overlay-building-row:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
+.overlay-building-row:last-child { border-bottom: none; padding-bottom: 0; }
 
 .overlay-building-name {
   flex: 1;
@@ -108,13 +101,8 @@
   cursor: pointer;
   transition: filter 0.1s ease;
 }
-
 .overlay-buy-btn:hover { filter: brightness(1.35); }
-
-.overlay-buy-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
+.overlay-buy-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
 /* ----- Housing panel ----- */
 #overlay-housing {
@@ -130,6 +118,70 @@
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.88);
   pointer-events: auto;
   z-index: 20;
+}
+
+/* ----- Town panel (upgrade / repair) — Step 17 ----- */
+#overlay-town-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  background: rgba(10, 6, 2, 0.94);
+  border: 1px solid var(--era-highlight, #CD853F);
+  border-radius: 6px;
+  padding: 24px 24px 20px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.88);
+  pointer-events: auto;
+  z-index: 22;
+}
+
+.town-panel-hp {
+  font-family: monospace;
+  font-size: 13px;
+  color: rgba(210, 180, 140, 0.85);
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.town-panel-section {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(180, 130, 50, 0.18);
+}
+.town-panel-section:last-child { border-bottom: none; }
+
+.town-panel-section-head {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--era-text, #D2B48C);
+  margin-bottom: 6px;
+}
+
+.town-panel-cost {
+  font-family: monospace;
+  font-size: 11px;
+  color: #f0c040;
+  margin-bottom: 8px;
+}
+
+/* ----- Tower supply info — Step 15 ----- */
+.tower-panel-supply {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  font-family: monospace;
+  font-size: 12px;
+  color: rgba(210, 180, 140, 0.75);
+}
+
+.supply-ring {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
 }
 
 /* ----- People Arrival Popup ----- */
@@ -183,7 +235,6 @@
   padding: 7px 0;
   border-bottom: 1px solid rgba(180, 130, 50, 0.14);
 }
-
 .popup-person-row:last-child { border-bottom: none; }
 
 .popup-person-icon {
@@ -229,11 +280,7 @@
 }
 
 .popup-btn:hover:not(:disabled) { filter: brightness(1.3); }
-
-.popup-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
+.popup-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .popup-person-status {
   flex: 1;
@@ -242,9 +289,54 @@
   text-align: right;
   color: rgba(210, 180, 140, 0.45);
 }
-
 .status-accepted { color: #7ec860; }
 .status-rejected { color: rgba(180, 100, 100, 0.7); }
+
+/* ----- Era Advancement Overlay — Step 17 ----- */
+#popup-era-advance {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 480px;
+  background: rgba(8, 4, 1, 0.97);
+  border: 2px solid var(--era-highlight, #CD853F);
+  border-radius: 8px;
+  padding: 32px 36px 28px;
+  box-shadow: 0 12px 60px rgba(0, 0, 0, 0.95);
+  pointer-events: auto;
+  z-index: 30;
+}
+
+.popup-era-subtitle {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #f0c040;
+  text-align: center;
+  text-shadow: 0 0 20px rgba(240, 192, 64, 0.5);
+  margin-bottom: 20px;
+}
+
+.popup-era-unlocks {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+}
+
+.popup-era-unlocks li {
+  font-family: monospace;
+  font-size: 12px;
+  color: rgba(210, 180, 140, 0.85);
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(180, 130, 50, 0.12);
+}
+
+.popup-era-unlocks li::before {
+  content: '\2713  ';
+  color: #7ec860;
+}
 
 /* ----- Tower selection panel ----- */
 #overlay-tower-panel {
@@ -287,13 +379,8 @@
   cursor: pointer;
   transition: filter 0.1s ease;
 }
-
 .tower-panel-staff-btn:hover:not(:disabled) { filter: brightness(1.35); }
-
-.tower-panel-staff-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
+.tower-panel-staff-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
 .tower-panel-staff-label {
   font-family: 'Cinzel', 'Georgia', serif;
@@ -327,7 +414,6 @@
   cursor: pointer;
   transition: filter 0.1s ease;
 }
-
 .tower-panel-demolish-btn:hover { filter: brightness(1.3); }
 
 /* ----- Barricade selection panel ----- */
@@ -393,7 +479,6 @@
   flex-direction: row;
 }
 
-/* Left panel — town buildings list */
 #supply-left-panel {
   position: absolute;
   top: 0;
@@ -407,7 +492,6 @@
   box-sizing: border-box;
 }
 
-/* Stats bar — top of the SVG area */
 #supply-stats {
   position: absolute;
   top: 14px;
@@ -423,7 +507,6 @@
   pointer-events: none;
 }
 
-/* SVG network area */
 #supply-network-svg {
   position: absolute;
   top: 44px;
@@ -433,7 +516,6 @@
   display: block;
 }
 
-/* Hint text in left panel */
 .supply-hint {
   font-family: monospace;
   font-size: 11px;

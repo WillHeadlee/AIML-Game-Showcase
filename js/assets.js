@@ -1,34 +1,9 @@
 /* ============================================================
    assets.js — Asset manifest, on-demand preloader, animation registry
-   ============================================================
-
-   API:
-     Assets.load(key)            → Promise  load one entity's animations
-     Assets.getAnim(key, anim)   → entry    { image|images, meta } or null
-     Assets.isReady(key)         → bool
-     Assets.MANIFEST             object     full entity manifest
-     Assets.SFX                  object     sfx file paths
-*/
+   ============================================================ */
 
 const Assets = (() => {
 
-  // ── Manifest ────────────────────────────────────────────────────────────
-  //
-  // type:'sheet'  — single sprite-sheet PNG, one row per direction.
-  //   fw, fh     : source frame size in pixels
-  //   frames     : number of columns (animation frames)
-  //   dir        : row index (0=down 1=left 2=right 3=up); use 2 for right-facing
-  //   fps        : playback speed
-  //
-  // type:'frames' — sequence of numbered individual image files.
-  //   dir        : folder path (relative to project root)
-  //   count      : total frame files
-  //   pad        : zero-pad width for frame number
-  //   prefix     : filename prefix before the number
-  //   ext        : file extension (jpg | png)
-  //   fw, fh     : native frame resolution (used for aspect ratio)
-  //   fps        : playback speed
-  //
   const MANIFEST = {
 
     // ── Era I — Enemies ──────────────────────────────────────────────────
@@ -96,6 +71,28 @@ const Assets = (() => {
       },
     },
 
+    // ── Era II — Enemies ─────────────────────────────────────────────────
+    witch: {
+      era: 2, role: 'enemy',
+      anims: {
+        walk: { type:'frames', dir:'assets/Witch/witch-attacking', count:145, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    vampire: {
+      era: 2, role: 'enemy',
+      anims: {
+        walk: { type:'frames', dir:'assets/Vampire/vampire-attacking', count:109, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    ghost: {
+      era: 2, role: 'enemy',
+      anims: {
+        walk: { type:'frames', dir:'assets/Ghost/ghost-attacking', count:192, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+      },
+    },
+
     // ── Era II — Towers ──────────────────────────────────────────────────
     swordMan: {
       era: 2, role: 'tower',
@@ -112,6 +109,52 @@ const Assets = (() => {
         attack: { type:'frames', dir:'assets/Horse Man/horse-man-attacking', count:116, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
       },
     },
+
+    crossbowMan: {
+      era: 2, role: 'tower',
+      anims: {
+        attack: { type:'frames', dir:'assets/Crossbow Man/crossbow-man-attacking', count:124, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    // ── Era III — Enemies ────────────────────────────────────────────────
+    pirateSword: {
+      era: 3, role: 'enemy',
+      anims: {
+        walk: { type:'frames', dir:'assets/Sword Pirate/sword-pirate-attacking', count:114, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    pirateRifle: {
+      era: 3, role: 'enemy',
+      anims: {
+        walk: { type:'frames', dir:'assets/Flintlock Pirate/flintlock-pirate-attacking', count:146, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    pirateBomb: {
+      era: 3, role: 'enemy',
+      anims: {
+        walk: { type:'frames', dir:'assets/Bomb Pirate/bomb-pirate-attacking', count:164, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    // ── Era III — Towers ─────────────────────────────────────────────────
+    cutlassMan: {
+      era: 3, role: 'tower',
+      anims: {
+        attack: { type:'frames', dir:'assets/Cutlass Man/cutlass-man-attacking', count:140, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    blunderbussMan: {
+      era: 3, role: 'tower',
+      anims: {
+        attack: { type:'frames', dir:'assets/Blunderbuss Man/blunderbuss-man-attacking', count:143, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    // Era IV & V use placeholder rendering (no sprite assets yet)
   };
 
   // ── SFX paths ────────────────────────────────────────────────────────────
@@ -128,12 +171,9 @@ const Assets = (() => {
     horse:   'assets/sfx/horse.wav',
   };
 
-  // ── Registry ─────────────────────────────────────────────────────────────
-  // registry[key][animName] = { image, images, meta }
   const registry  = {};
-  const loading   = {}; // key → Promise (prevents double-loading)
+  const loading   = {};
 
-  // ── Internal helpers ─────────────────────────────────────────────────────
   function loadImage(src) {
     return new Promise(resolve => {
       const img = new Image();
@@ -153,7 +193,6 @@ const Assets = (() => {
       const image = await loadImage(animDef.src);
       return { image, images: null, meta: animDef };
     }
-    // 'frames' type — load all individual files
     const promises = [];
     for (let i = 1; i <= animDef.count; i++) {
       promises.push(loadImage(frameUrl(animDef, i)));
@@ -162,42 +201,31 @@ const Assets = (() => {
     return { image: null, images, meta: animDef };
   }
 
-  // ── Public API ───────────────────────────────────────────────────────────
-
-  // load(key) — load one entity's animations on demand.
-  // Returns a Promise; safe to call multiple times (idempotent).
   function load(key) {
-    if (registry[key]) return Promise.resolve();   // already loaded
-    if (loading[key])  return loading[key];         // in-flight
-
+    if (registry[key]) return Promise.resolve();
+    if (loading[key])  return loading[key];
     const def = MANIFEST[key];
     if (!def) { console.warn('[Assets] unknown key:', key); return Promise.resolve(); }
-
     registry[key] = {};
     const tasks = Object.entries(def.anims).map(([animName, animDef]) =>
       loadAnimEntry(animDef).then(entry => { registry[key][animName] = entry; })
     );
-
     loading[key] = Promise.all(tasks).then(() => {
       Events.emit('assets:ready', { key });
       console.log(`[Assets] loaded: ${key}`);
     });
-
     return loading[key];
   }
 
-  // loadEra(era) — convenience: load all entities for an era.
   function loadEra(era) {
     const keys = Object.keys(MANIFEST).filter(k => MANIFEST[k].era === era);
     return Promise.all(keys.map(load));
   }
 
-  // getAnim(key, animName) — returns loaded entry or null if not ready yet.
   function getAnim(key, animName) {
     return registry[key]?.[animName] ?? null;
   }
 
-  // isReady(key) — true if this entity's assets are fully loaded.
   function isReady(key) {
     return !!registry[key];
   }
