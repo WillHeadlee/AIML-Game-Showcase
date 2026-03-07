@@ -11,12 +11,7 @@ const Assets = (() => {
       era: 1, role: 'enemy',
       sfx: 'boar',
       anims: {
-        idle:   { type:'sheet', src:'assets/Boar/Boar_Idle_with_shadow.png',   frames:4, fps:6,  fw:32, fh:32, dir:2 },
-        walk:   { type:'sheet', src:'assets/Boar/Boar_Walk_with_shadow.png',   frames:6, fps:10, fw:32, fh:32, dir:2 },
-        run:    { type:'sheet', src:'assets/Boar/Boar_Run_with_shadow.png',    frames:6, fps:14, fw:32, fh:32, dir:2 },
-        attack: { type:'sheet', src:'assets/Boar/Boar_Attack_with_shadow.png', frames:5, fps:12, fw:32, fh:32, dir:2 },
-        hurt:   { type:'sheet', src:'assets/Boar/Boar_Hurt_with_shadow.png',   frames:3, fps:10, fw:32, fh:32, dir:2 },
-        death:  { type:'sheet', src:'assets/Boar/Boar_Death_with_shadow.png',  frames:4, fps:8,  fw:32, fh:32, dir:2 },
+        walk: { type:'frames', dir:'assets/Boar/boar-attacking', count:109, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
       },
     },
 
@@ -24,8 +19,7 @@ const Assets = (() => {
       era: 1, role: 'enemy',
       sfx: 'mammoth',
       anims: {
-        walk:   { type:'frames', dir:'assets/Mammoth/mammoth_walking',   count:21, pad:3, prefix:'ezgif-frame-', ext:'png', fps:12, fw:768,  fh:448 },
-        attack: { type:'frames', dir:'assets/Mammoth/mammoth_attacking', count:21, pad:3, prefix:'ezgif-frame-', ext:'png', fps:12, fw:768,  fh:448 },
+        walk: { type:'frames', dir:'assets/Mammoth/mammoth-attacking', count:129, pad:4, prefix:'', ext:'jpg', fps:12, fw:1280, fh:720 },
       },
     },
 
@@ -33,8 +27,7 @@ const Assets = (() => {
       era: 1, role: 'enemy',
       sfx: 'tiger',
       anims: {
-        walk:   { type:'frames', dir:'assets/Saber Tooth Tiger/saber-tooth-tiger-walking',   count:148, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
-        attack: { type:'frames', dir:'assets/Saber Tooth Tiger/saber-tooth-tiger-attacking', count:175, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        walk: { type:'frames', dir:'assets/Saber Tooth Tiger/saber-tooth-tiger-attacking', count:175, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
       },
     },
 

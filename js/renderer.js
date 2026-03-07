@@ -110,10 +110,9 @@ const Renderer = (() => {
       ctx.translate(pos.x, pos.y);
       ctx.rotate(angle);
 
-      if (animEntry) {
-        drawSprite(animEntry, e.frameIndex, -e.drawW / 2, -e.drawH / 2, e.drawW, e.drawH);
-      } else {
-        // Placeholder colored circle
+      const drawn = animEntry && drawSprite(animEntry, e.frameIndex, -e.drawW / 2, -e.drawH / 2, e.drawW, e.drawH);
+      if (!drawn) {
+        // Fallback colored circle (no sprite or image not yet loaded)
         ctx.fillStyle = _enemyColor(e.type);
         ctx.beginPath();
         ctx.arc(0, 0, Math.min(e.drawW, e.drawH) / 3, 0, Math.PI * 2);
@@ -252,22 +251,25 @@ const Renderer = (() => {
     ctx.strokeRect(px + 1, py + 1, Map.CELL - 2, Map.CELL - 2);
   }
 
-  // ----- Sprite drawing -----
+  // ----- Sprite drawing — returns true if something was drawn -----
   function drawSprite(animEntry, frameIndex, x, y, w, h) {
-    if (!animEntry) return;
+    if (!animEntry) return false;
     const { image, images, meta } = animEntry;
 
     if (meta.type === 'sheet') {
-      if (!image?.complete) return;
+      if (!image?.complete) return false;
       const fi = frameIndex % meta.frames;
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(image, fi * meta.fw, meta.dir * meta.fh, meta.fw, meta.fh, x, y, w, h);
       ctx.imageSmoothingEnabled = true;
+      return true;
     } else {
-      if (!images) return;
+      if (!images) return false;
       const fi  = frameIndex % images.length;
       const img = images[fi];
-      if (img?.complete) ctx.drawImage(img, x, y, w, h);
+      if (!img?.complete) return false;
+      ctx.drawImage(img, x, y, w, h);
+      return true;
     }
   }
 
