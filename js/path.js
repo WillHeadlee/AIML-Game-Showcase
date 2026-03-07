@@ -3,14 +3,14 @@
    ============================================================ */
 
 const Path = (() => {
-  // 5 base waypoints in canvas pixels, tracing the dirt path in Map.jpeg.
-  // Path dips slightly south-east from entry, then arcs up to the gate.
+  // 5 base waypoints in canvas pixels — a gentle single arc from the left
+  // edge that curves smoothly upward until it reaches the wall gate.
   const WAYPOINTS = [
-    { x:   0, y: 614 },   // P0 — left edge entry
-    { x: 175, y: 660 },   // P1 — dips down following road curve
-    { x: 420, y: 615 },   // P2 — road starts rising
-    { x: 714, y: 529 },   // P3 — continuing upward
-    { x: 948, y: 476 },   // P4 — gate entry (wall col ~23.7)
+    { x:   0, y: 555 },   // P0 — left edge entry (just below centre)
+    { x: 240, y: 558 },   // P1 — nearly straight east, barely any drift
+    { x: 490, y: 510 },   // P2 — begins gentle upward curve
+    { x: 730, y: 532 },   // P3 — continuing arc
+    { x: 958, y: 535 },   // P4 — gate entry (wall col 24)
   ];
 
   // Arc-length lookup table entry: { seg, t, x, y, dist }

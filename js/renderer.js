@@ -37,8 +37,56 @@ const Renderer = (() => {
     }
   }
 
-  // ----- Path corridor — invisible (map image shows the real path) -----
-  function drawPath() { /* intentionally empty */ }
+  // ----- Path corridor overlay -----
+  function drawPath() {
+    const total = Path.calculateTotalLength();
+    const STEP  = 6;
+
+    // Filled semi-transparent corridor
+    ctx.beginPath();
+    for (let d = 0; d <= total; d += STEP) {
+      const pos = Path.getPositionAtDistance(d);
+      const tan = Path.getTangentAtDistance(d);
+      const nx  = -tan.y * 40, ny = tan.x * 40; // normal, 40px half-width
+      if (d === 0) {
+        ctx.moveTo(pos.x + nx, pos.y + ny);
+      } else {
+        ctx.lineTo(pos.x + nx, pos.y + ny);
+      }
+    }
+    for (let d = total; d >= 0; d -= STEP) {
+      const pos = Path.getPositionAtDistance(d);
+      const tan = Path.getTangentAtDistance(d);
+      const nx  = -tan.y * 40, ny = tan.x * 40;
+      ctx.lineTo(pos.x - nx, pos.y - ny);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(255, 200, 80, 0.18)';
+    ctx.fill();
+
+    // Centre line
+    ctx.beginPath();
+    for (let d = 0; d <= total; d += STEP) {
+      const { x, y } = Path.getPositionAtDistance(d);
+      d === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = 'rgba(255, 200, 80, 0.7)';
+    ctx.lineWidth   = 2.5;
+    ctx.setLineDash([14, 8]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Waypoint dots
+    for (const wp of Path.WAYPOINTS) {
+      ctx.beginPath();
+      ctx.arc(wp.x, wp.y, 7, 0, Math.PI * 2);
+      ctx.fillStyle   = 'rgba(255, 220, 60, 0.9)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+      ctx.lineWidth   = 1.5;
+      ctx.stroke();
+    }
+  }
 
   // ----- Grid cells -----
   function drawGrid() {
