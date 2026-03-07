@@ -80,9 +80,9 @@ const Enemies = (() => {
       const mult = Barricades.getSpeedMultiplier(pos.x, pos.y);
       this.distance += this.speed * mult * (dt / 1000);
 
-      // Sinusoidal lateral wobble, clamped to ±60px
+      // Sinusoidal lateral wobble, clamped to ±8px
       this.wobblePhase += this.wobbleFreq * 2 * Math.PI * (dt / 1000);
-      this.wobble = Math.sin(this.wobblePhase) * 60;
+      this.wobble = Math.sin(this.wobblePhase) * 8;
 
       if (this.distance >= Path.calculateTotalLength()) {
         this.reached = true;

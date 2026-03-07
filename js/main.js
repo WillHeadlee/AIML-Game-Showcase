@@ -128,7 +128,7 @@ function update(delta) {
   Enemies.update(delta);
   Barricades.update(delta);
   Towers.update(delta);
-  Supply.update();
+  if (typeof Supply !== 'undefined') Supply.update();
   Abilities.update(delta);
 }
 
