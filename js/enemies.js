@@ -82,7 +82,7 @@ const Enemies = (() => {
 
       // Sinusoidal lateral wobble, clamped to ±8px
       this.wobblePhase += this.wobbleFreq * 2 * Math.PI * (dt / 1000);
-      this.wobble = Math.sin(this.wobblePhase) * 8;
+      this.wobble = Math.sin(this.wobblePhase) * 20;
 
       if (this.distance >= Path.calculateTotalLength()) {
         this.reached = true;
