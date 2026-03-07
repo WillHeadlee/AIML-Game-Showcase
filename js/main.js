@@ -13,6 +13,17 @@ let canvas, ctx;
 let lastTimestamp = 0;
 let assetsReady   = false;
 
+function _showError(e) {
+  let el = document.getElementById('_dbg_error');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = '_dbg_error';
+    el.style.cssText = 'position:fixed;top:0;left:0;background:red;color:#fff;font:14px monospace;padding:8px;z-index:9999;max-width:100%;white-space:pre-wrap;';
+    document.body.appendChild(el);
+  }
+  el.textContent = String(e);
+}
+
 // ----- Viewport scaling -----
 function scaleGame() {
   const wrapper = document.getElementById('game-wrapper');
@@ -102,8 +113,8 @@ function loop(timestamp) {
   const delta = Math.min(timestamp - lastTimestamp, 100);
   lastTimestamp = timestamp;
 
-  update(delta);
-  render();
+  try { update(delta); } catch(e) { console.error('[update] crash:', e); _showError(e); }
+  try { render(); } catch(e) { console.error('[render] crash:', e); _showError(e); }
 
   requestAnimationFrame(loop);
 }
