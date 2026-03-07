@@ -89,11 +89,10 @@ function init() {
     setTimeout(() => { window.location.href = 'index.html'; }, 1500);
   });
 
-  // Load Era 1 assets; unlock the Start Wave button when ready
-  Assets.loadEra(1).then(() => {
-    assetsReady = true;
-    UI.enableStartButton();
-  });
+  // Start game immediately; load sprites in background (circle fallback renders until ready)
+  assetsReady = true;
+  UI.enableStartButton();
+  Assets.loadEra(1);
 
   requestAnimationFrame(loop);
 }
