@@ -56,14 +56,6 @@ const Assets = (() => {
       },
     },
 
-    bowMan: {
-      era: 1, role: 'tower',
-      sfx: 'bow',
-      anims: {
-        attack: { type:'frames', dir:'assets/Bow Man/bow-man-attacking', count:102, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
-      },
-    },
-
     // ── Era II — Enemies ─────────────────────────────────────────────────
     witch: {
       era: 2, role: 'enemy',
@@ -143,7 +135,7 @@ const Assets = (() => {
     blunderbussMan: {
       era: 3, role: 'tower',
       anims: {
-        attack: { type:'frames', dir:'assets/Blunderbuss Man/blunderbuss-man-attacking', count:143, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Blunderbuss Man/blunderbuss-man-attacking-png', count:143, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 

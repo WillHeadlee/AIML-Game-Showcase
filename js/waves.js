@@ -12,52 +12,52 @@ const Waves = (() => {
 
     // ── Era 1 — Prehistoric ───────────────────────────────────────────────
     1: [
-      /* W1 */ [{ type:'boar',       count: 90 }],
-      /* W2 */ [{ type:'sabreTooth', count: 90 }],
-      /* W3 */ [{ type:'mastodon',   count: 42 }],
-      /* W4 */ [{ type:'boar',       count:128 }, { type:'sabreTooth', count:85 }],
-      /* W5 */ [{ type:'boar',       count: 90 }, { type:'sabreTooth', count:79 }, { type:'mastodon', count:56 }],
+      /* W1 */ [{ type:'boar',       count:  8 }],
+      /* W2 */ [{ type:'sabreTooth', count:  8 }],
+      /* W3 */ [{ type:'mastodon',   count:  5 }],
+      /* W4 */ [{ type:'boar',       count: 10 }, { type:'sabreTooth', count: 8 }],
+      /* W5 */ [{ type:'boar',       count: 10 }, { type:'sabreTooth', count: 8 }, { type:'mastodon', count: 5 }],
     ],
 
     // ── Era 2 — Medieval ─────────────────────────────────────────────────
     2: [
-      /* W1 */ [{ type:'witch',   count: 66 }],
-      /* W2 */ [{ type:'vampire', count:102 }],
-      /* W3 */ [{ type:'ghost',   count:162 }],
-      /* W4 */ [{ type:'witch',   count: 94 }, { type:'vampire', count:94 }],
-      /* W5 */ [{ type:'witch',   count: 96 }, { type:'vampire', count:96 }, { type:'ghost', count:83 }],
+      /* W1 */ [{ type:'witch',   count:  8 }],
+      /* W2 */ [{ type:'vampire', count: 10 }],
+      /* W3 */ [{ type:'ghost',   count: 12 }],
+      /* W4 */ [{ type:'witch',   count: 10 }, { type:'vampire', count: 10 }],
+      /* W5 */ [{ type:'witch',   count: 10 }, { type:'vampire', count: 10 }, { type:'ghost', count:  8 }],
     ],
 
     // ── Era 3 — Pirate ───────────────────────────────────────────────────
     3: [
-      /* W1 */ [{ type:'pirateSword', count: 71 }],
-      /* W2 */ [{ type:'pirateRifle', count:109 }],
-      /* W3 */ [{ type:'pirateSword', count: 51 }, { type:'pirateRifle', count:51 }, { type:'pirateBomb', count:50 }],
-      /* W4 */ [{ type:'pirateSword', count: 81 }, { type:'pirateRifle', count:71 }, { type:'pirateBomb', count:50 }],
-      /* W5 */ [{ type:'pirateSword', count:103 }, { type:'pirateRifle', count:103 }, { type:'pirateBomb', count:88 }],
+      /* W1 */ [{ type:'pirateSword', count:  8 }],
+      /* W2 */ [{ type:'pirateRifle', count: 10 }],
+      /* W3 */ [{ type:'pirateSword', count:  6 }, { type:'pirateRifle', count: 6 }, { type:'pirateBomb', count: 5 }],
+      /* W4 */ [{ type:'pirateSword', count:  8 }, { type:'pirateRifle', count: 7 }, { type:'pirateBomb', count: 6 }],
+      /* W5 */ [{ type:'pirateSword', count: 10 }, { type:'pirateRifle', count:10 }, { type:'pirateBomb', count: 8 }],
     ],
 
     // ── Era 4 — WW2 Zombies ──────────────────────────────────────────────
     4: [
-      /* W1 */ [{ type:'gruntZombie', count: 97 }],
-      /* W2 */ [{ type:'vombie',      count:150 }],
-      /* W3 */ [{ type:'gruntZombie', count:104 }, { type:'vombie',     count:104 }],
-      /* W4 */ [{ type:'gruntZombie', count:125 }, { type:'vombie',     count: 97 }, { type:'necroZombie', count:55 }],
-      /* W5 */ [{ type:'gruntZombie', count:182 }, { type:'vombie',     count:121 }, { type:'necroZombie', count:101 }],
+      /* W1 */ [{ type:'gruntZombie', count: 10 }],
+      /* W2 */ [{ type:'vombie',      count: 12 }],
+      /* W3 */ [{ type:'gruntZombie', count: 10 }, { type:'vombie',     count: 10 }],
+      /* W4 */ [{ type:'gruntZombie', count: 12 }, { type:'vombie',     count: 10 }, { type:'necroZombie', count: 5 }],
+      /* W5 */ [{ type:'gruntZombie', count: 15 }, { type:'vombie',     count: 12 }, { type:'necroZombie', count:10 }],
     ],
 
     // ── Era 5 — Sci-Fi ───────────────────────────────────────────────────
     5: [
-      /* W1 */ [{ type:'laserAlien',   count:101 }],
-      /* W2 */ [{ type:'flyingSaucer', count:155 }],
-      /* W3 */ [{ type:'laserAlien',   count:108 }, { type:'fortniteBart', count:108 }],
-      /* W4 */ [{ type:'laserAlien',   count:115 }, { type:'fortniteBart', count:101 }, { type:'flyingSaucer', count:72 }],
-      /* W5 */ [{ type:'laserAlien',   count:189 }, { type:'fortniteBart', count:142 }, { type:'flyingSaucer', count:142 }],
+      /* W1 */ [{ type:'laserAlien',   count: 10 }],
+      /* W2 */ [{ type:'flyingSaucer', count: 12 }],
+      /* W3 */ [{ type:'laserAlien',   count: 10 }, { type:'fortniteBart', count: 10 }],
+      /* W4 */ [{ type:'laserAlien',   count: 12 }, { type:'fortniteBart', count: 10 }, { type:'flyingSaucer', count:  7 }],
+      /* W5 */ [{ type:'laserAlien',   count: 15 }, { type:'fortniteBart', count: 12 }, { type:'flyingSaucer', count: 12 }],
     ],
   };
 
   // ----- Spawner state -----
-  const SPAWN_INTERVAL = 1500;  // ms between spawns
+  const SPAWN_INTERVAL = 2000;  // ms between spawns
 
   let spawnQueue   = [];   // flat array of type strings, shuffled
   let spawned      = 0;    // how many have been released so far

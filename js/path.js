@@ -3,14 +3,12 @@
    ============================================================ */
 
 const Path = (() => {
-  // 5 base waypoints in canvas pixels — a gentle single arc from the left
-  // edge that curves smoothly upward until it reaches the wall gate.
+  // Straight horizontal path from the left edge to the wall gate.
   const WAYPOINTS = [
-    { x:   0, y: 555 },   // P0 — left edge entry (just below centre)
-    { x: 240, y: 558 },   // P1 — nearly straight east, barely any drift
-    { x: 490, y: 510 },   // P2 — begins gentle upward curve
-    { x: 730, y: 532 },   // P3 — continuing arc
-    { x: 958, y: 535 },   // P4 — gate entry (wall col 24)
+    { x:   0, y: 565 },   // P0 — left edge entry
+    { x: 320, y: 565 },   // P1
+    { x: 640, y: 565 },   // P2
+    { x: 958, y: 565 },   // P3 — gate entry (wall col 24)
   ];
 
   // Arc-length lookup table entry: { seg, t, x, y, dist }
@@ -140,7 +138,7 @@ const Path = (() => {
   // Marks all defense-zone grid cells whose center is within 2 tiles (80px)
   // of the spline center line as state='path'.  Called once on init.
   function markPathCells() {
-    const HALF_WIDTH = Map.CELL * 2; // 80px — 2 tiles each side = 4 tiles total
+    const HALF_WIDTH = Map.CELL * 2.5; // 50px — extends path zone one extra row below center
 
     // Pre-sample path points densely
     const pts = [];
@@ -150,8 +148,8 @@ const Path = (() => {
 
     for (let gy = 0; gy < Map.ROWS; gy++) {
       for (let gx = 0; gx < Map.WALL_COL; gx++) {
-        const cx = 20 + gx * Map.CELL;  // cell center x
-        const cy = 20 + gy * Map.CELL;  // cell center y
+        const cx = Map.CELL / 2 + gx * Map.CELL;  // cell center x
+        const cy = Map.CELL / 2 + gy * Map.CELL;  // cell center y
         for (const pt of pts) {
           const dx = cx - pt.x, dy = cy - pt.y;
           if (dx * dx + dy * dy <= HALF_WIDTH * HALF_WIDTH) {

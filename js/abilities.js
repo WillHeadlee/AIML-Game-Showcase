@@ -7,8 +7,8 @@ const Abilities = (() => {
   // One ability per era
   const DEFS = {
     1: { name: 'Fire Rain',    chargeTime: 75, effect: 'allScreen',   damage:  60 },
-    2: { name: 'Trebuchet',    chargeTime: 70, effect: 'aoeClick',    damage: 120, radius: 3 },
-    3: { name: 'Cannon',       chargeTime: 65, effect: 'cannonClick', damage: 200, splash: 80, splashRadius: 2 },
+    2: { name: 'Trebuchet',    chargeTime: 70, effect: 'aoeClick',    damage: 120, radius: 6 },
+    3: { name: 'Cannon',       chargeTime: 65, effect: 'cannonClick', damage: 200, splash: 80, splashRadius: 4 },
     4: { name: 'Fighter Jets', chargeTime: 60, effect: 'lineClick',   damage: 350 },
     5: { name: 'Nuclear Bomb', chargeTime: 55, effect: 'allScreen',   damage: 800 },
   };

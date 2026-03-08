@@ -9,7 +9,7 @@ const Renderer = (() => {
   function init(context) {
     ctx = context;
     mapBg = new Image();
-    mapBg.src = 'assets/Map.jpeg';
+    mapBg.src = 'assets/New map.png';
   }
 
   // ----- Era theme helpers -----
@@ -94,7 +94,7 @@ const Renderer = (() => {
       for (let gx = 0; gx < Map.COLS; gx++) {
         const cell = Map.getCell(gx, gy);
         const px = gx * Map.CELL;
-        const py = gy * Map.CELL;
+        const py = gy * Map.CELL - 5;
 
         switch (cell.state) {
           case 'open':
@@ -169,15 +169,21 @@ const Renderer = (() => {
 
       ctx.restore();
 
-      // Health bar (always shown)
-      if (e.health < e.maxHealth) {
-        const barW = e.drawW * 0.8;
+      // Health bar — visible for 4s after taking damage, fades out in last second
+      if (e.damageTimer > 0 && e.health < e.maxHealth) {
+        const barW = e.drawW * 0.9;
         const barX = pos.x - barW / 2;
-        const barY = pos.y - e.drawH / 2 - 8;
-        ctx.fillStyle = '#400';
-        ctx.fillRect(barX, barY, barW, 4);
-        ctx.fillStyle = '#0c0';
-        ctx.fillRect(barX, barY, barW * (e.health / e.maxHealth), 4);
+        const barY = pos.y - e.drawH / 2 - 7;
+        const pct  = e.health / e.maxHealth;
+        ctx.globalAlpha = Math.min(1, e.damageTimer);
+        ctx.fillStyle = '#200';
+        ctx.fillRect(barX, barY, barW, 5);
+        ctx.fillStyle = pct > 0.5 ? '#3d3' : pct > 0.25 ? '#fa0' : '#f22';
+        ctx.fillRect(barX, barY, barW * pct, 5);
+        ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(barX, barY, barW, 5);
+        ctx.globalAlpha = 1;
       }
     }
   }
@@ -203,7 +209,7 @@ const Renderer = (() => {
   function drawTowers() {
     for (const t of Towers.getAll()) {
       const cx = t.cx;
-      const cy = t.cy;
+      const cy = t.cy - 5;  // align with grid -5px shift
       const r  = Map.CELL * 0.44;
 
       const animEntry = Assets.getAnim(t.spriteKey, 'attack');
@@ -257,7 +263,7 @@ const Renderer = (() => {
   function drawBarricades() {
     for (const b of Barricades.getAll()) {
       const px = b.gx * Map.CELL;
-      const py = b.gy * Map.CELL;
+      const py = b.gy * Map.CELL - 5;  // align with grid -5px shift
       const cy = py + Map.CELL / 2;
 
       ctx.fillStyle = '#7a4820';
@@ -290,13 +296,30 @@ const Renderer = (() => {
       ? Barricades.isValid(gx, gy)
       : Towers.isValid(gx, gy);
     const px = gx * Map.CELL;
-    const py = gy * Map.CELL;
+    const py = gy * Map.CELL - 5;  // align with grid -5px shift
 
     ctx.fillStyle   = valid ? 'rgba(0,220,80,0.28)'  : 'rgba(220,40,40,0.28)';
     ctx.strokeStyle = valid ? 'rgba(0,220,80,0.85)'  : 'rgba(220,40,40,0.85)';
     ctx.lineWidth   = 2;
     ctx.fillRect(px, py, Map.CELL, Map.CELL);
     ctx.strokeRect(px + 1, py + 1, Map.CELL - 2, Map.CELL - 2);
+
+    // Range preview circle for towers
+    const towerDef = selectedType !== 'barricade' ? Towers.DEFS[selectedType] : null;
+    if (towerDef) {
+      const cx = gx * Map.CELL + Map.CELL / 2;
+      const cy = gy * Map.CELL - 5 + Map.CELL / 2;
+      const r  = towerDef.rangeTiles * Map.CELL;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle   = valid ? 'rgba(0,220,80,0.07)' : 'rgba(220,40,40,0.07)';
+      ctx.fill();
+      ctx.strokeStyle = valid ? 'rgba(0,220,80,0.5)'  : 'rgba(220,40,40,0.5)';
+      ctx.lineWidth   = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
   }
 
   // ----- Sprite drawing — returns true if something was drawn -----

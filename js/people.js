@@ -4,10 +4,10 @@
 
 const People = (() => {
 
-  // Starting conditions (design doc):
-  // 3 people pre-seeded into unassigned pool, 1 Hut already built (capacity 2).
-  // 3 > capacity is intentional — player must build housing before accepting arrivals.
-  let totalCapacity  = 2;
+  // Starting conditions:
+  // 3 people pre-seeded into unassigned pool, 1 Hut already built (capacity 3).
+  // Capacity matches pool so arrivals can be accepted once wave 1 completes.
+  let totalCapacity  = 3;
   let unassignedPool = 3;
 
   // towerId (string) → count of assigned people

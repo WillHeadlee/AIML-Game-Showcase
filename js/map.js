@@ -4,29 +4,29 @@
 
 const Map = (() => {
   // ----- Constants -----
-  const COLS = 48;
-  const ROWS = 27;
-  const CELL = 40; // px per cell
+  const COLS = 96;
+  const ROWS = 54;
+  const CELL = 20; // px per cell
 
-  // Defense zone: cols 0-23  (pixels 0–959)
-  // Settlement zone: cols 24-47 (pixels 960–1919)
-  const WALL_COL = 24;
+  // Defense zone: cols 0-47  (pixels 0–959)
+  // Settlement zone: cols 48-95 (pixels 960–1919)
+  const WALL_COL = 48;
 
   const DEFENSE_ZONE    = { minCol: 0,        maxCol: WALL_COL - 1 };
   const SETTLEMENT_ZONE = { minCol: WALL_COL,  maxCol: COLS - 1 };
 
   // ----- Coordinate helpers -----
   // gridToPixel returns the CENTER of the cell in canvas pixels.
-  //   gridToPixel(0,0)   → {x:20,  y:20}
-  //   gridToPixel(47,26) → {x:1900, y:1060}
+  //   gridToPixel(0,0)   → {x:10,  y:10}
+  //   gridToPixel(95,53) → {x:1910, y:1070}
   function gridToPixel(gx, gy) {
-    return { x: 20 + gx * CELL, y: 20 + gy * CELL };
+    return { x: CELL / 2 + gx * CELL, y: CELL / 2 + gy * CELL };
   }
 
   function pixelToGrid(px, py) {
     return {
-      x: Math.floor((px - 20) / CELL),
-      y: Math.floor((py - 20) / CELL),
+      x: Math.floor((px - CELL / 2) / CELL),
+      y: Math.floor((py - CELL / 2) / CELL),
     };
   }
 
@@ -36,8 +36,12 @@ const Map = (() => {
   for (let gy = 0; gy < ROWS; gy++) {
     grid[gy] = [];
     for (let gx = 0; gx < COLS; gx++) {
-      // Defense zone defaults to 'open'; settlement zone to 'blocked'
-      grid[gy][gx] = { state: gx < WALL_COL ? 'open' : 'blocked' };
+      // Defense zone: 'open'; wall column: 'wall'; settlement zone: 'blocked'
+      let state;
+      if      (gx < WALL_COL) state = 'open';
+      else if (gx === WALL_COL) state = 'wall';
+      else                    state = 'blocked';
+      grid[gy][gx] = { state };
     }
   }
 

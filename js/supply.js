@@ -52,8 +52,13 @@ const Supply = (() => {
   }
 
   // ----- Per-tick distribution -----
-  function update() {
+  // Gradually moves each tower's supplyHealth toward its target (0–1)
+  // at a rate of 2 units/sec so changes feel smooth rather than instant.
+  function update(dt) {
     if (connections.size === 0) return;
+
+    const dtSec = (dt ?? 16) / 1000;
+    const RATE  = 2; // health units per second of adjustment
 
     const byPriority = { high: [], medium: [], low: [] };
     for (const [id, c] of connections) byPriority[c.priority].push([id, c]);
@@ -63,14 +68,13 @@ const Supply = (() => {
     for (const tier of ['high', 'medium', 'low']) {
       const group = byPriority[tier];
       if (group.length === 0) continue;
-      if (remaining >= group.length) {
-        for (const [, c] of group) c.supplyHealth = 1;
-        remaining -= group.length;
-      } else {
-        const each = group.length > 0 ? remaining / group.length : 0;
-        for (const [, c] of group) c.supplyHealth = each;
-        remaining = 0;
+      const target = remaining >= group.length ? 1 : (group.length > 0 ? remaining / group.length : 0);
+      for (const [, c] of group) {
+        const delta = target - c.supplyHealth;
+        c.supplyHealth += Math.sign(delta) * Math.min(Math.abs(delta), RATE * dtSec);
+        c.supplyHealth = Math.max(0, Math.min(1, c.supplyHealth));
       }
+      remaining = Math.max(0, remaining - group.length);
     }
   }
 

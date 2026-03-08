@@ -13,17 +13,6 @@ let canvas, ctx;
 let lastTimestamp = 0;
 let assetsReady   = false;
 
-function _showError(e) {
-  let el = document.getElementById('_dbg_error');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = '_dbg_error';
-    el.style.cssText = 'position:fixed;top:0;left:0;background:red;color:#fff;font:14px monospace;padding:8px;z-index:9999;max-width:100%;white-space:pre-wrap;';
-    document.body.appendChild(el);
-  }
-  el.textContent = String(e);
-}
-
 // ----- Viewport scaling -----
 function scaleGame() {
   const wrapper = document.getElementById('game-wrapper');
@@ -49,9 +38,6 @@ function init() {
   HousingPanel.init();
   SupplyOverlay.init();
 
-  Events.on('test', d => console.log('[Events] received:', d));
-  Events.emit('test', { message: 'Event bus OK', state });
-
   // Wave complete — advance counter or era
   Events.on('wave:complete', () => {
     if (state.currentWave >= 5) {
@@ -62,7 +48,7 @@ function init() {
         // Win condition
         state.phase = 'gameover';
         UI.update(state);
-        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'game.html'; }, 2000);
         return;
       }
 
@@ -97,7 +83,7 @@ function init() {
   Events.on('game:over', () => {
     state.phase = 'gameover';
     UI.update(state);
-    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+    setTimeout(() => { window.location.href = 'game.html'; }, 1500);
   });
 
   // Start game immediately; load sprites in background (circle fallback renders until ready)
@@ -113,8 +99,8 @@ function loop(timestamp) {
   const delta = Math.min(timestamp - lastTimestamp, 100);
   lastTimestamp = timestamp;
 
-  try { update(delta); } catch(e) { console.error('[update] crash:', e); _showError(e); }
-  try { render(); } catch(e) { console.error('[render] crash:', e); _showError(e); }
+  try { update(delta); } catch(e) { console.error('[update] crash:', e); }
+  try { render(); } catch(e) { console.error('[render] crash:', e); }
 
   requestAnimationFrame(loop);
 }
@@ -128,7 +114,7 @@ function update(delta) {
   Enemies.update(delta);
   Barricades.update(delta);
   Towers.update(delta);
-  if (typeof Supply !== 'undefined') Supply.update();
+  if (typeof Supply !== 'undefined') Supply.update(delta);
   Abilities.update(delta);
 }
 
@@ -137,8 +123,8 @@ function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   Renderer.drawZones();
-  Renderer.drawPath();
   Renderer.drawGrid();
+  Renderer.drawWall();
   Renderer.drawBarricades();
   Renderer.drawTowers();
   Renderer.drawBuildHighlight();

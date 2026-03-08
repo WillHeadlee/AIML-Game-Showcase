@@ -225,7 +225,7 @@ const UI = (() => {
     if (!buildMode || state.phase !== 'prep') { hoverCell = null; return; }
     const { cx, cy } = _canvasCoords(e);
     const gx = Math.floor(cx / Map.CELL);
-    const gy = Math.floor(cy / Map.CELL);
+    const gy = Math.floor((cy + 5) / Map.CELL);  // +5 to account for -5px grid shift
     if (gx < 0 || gx >= Map.COLS || gy < 0 || gy >= Map.ROWS) {
       hoverCell = null;
     } else {
@@ -245,7 +245,7 @@ const UI = (() => {
     }
 
     const gx = Math.floor(cx / Map.CELL);
-    const gy = Math.floor(cy / Map.CELL);
+    const gy = Math.floor((cy + 5) / Map.CELL);  // +5 to account for -5px grid shift
 
     // Build mode
     if (buildMode && state.phase === 'prep') {
@@ -606,7 +606,9 @@ const UI = (() => {
     repCost.textContent = repCfg ? _formatCost(repCfg.cost) : '';
     const repBtn = document.createElement('button');
     repBtn.className = 'overlay-buy-btn';
-    repBtn.textContent = 'Repair';
+    const atFullHp = Town.getHealth() >= Town.getMaxHealth();
+    repBtn.textContent = atFullHp ? 'Full HP' : 'Repair';
+    repBtn.disabled = atFullHp;
     repBtn.addEventListener('click', () => {
       const res = Town.repair(era);
       if (res === 'insufficient') _flashResourceError();

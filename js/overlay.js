@@ -79,11 +79,12 @@ const TownBuildingsPanel = (() => {
       const buyBtn = document.createElement('button');
       buyBtn.className = 'overlay-buy-btn';
       buyBtn.textContent = 'Buy';
+      buyBtn.disabled = !Resources.canAfford({ gold: b.goldCost });
       buyBtn.addEventListener('click', () => _onBuy(b));
 
       row.append(nameEl, prodEl, costEl, countEl, buyBtn);
       panelEl.appendChild(row);
-      rowEls[b.id] = { countEl, row };
+      rowEls[b.id] = { countEl, buyBtn, row };
     }
 
     document.getElementById('hud').appendChild(panelEl);
@@ -97,6 +98,10 @@ const TownBuildingsPanel = (() => {
     // Also register supply production for Era 3+ buildings
     if (building.era >= 3) Supply.addProduction(1);
     rowEls[building.id].countEl.textContent = `Owned: ${ownedCounts[building.id]}`;
+    // Refresh all buy button affordability after purchase
+    for (const b of ALL_BUILDINGS) {
+      if (rowEls[b.id]?.buyBtn) rowEls[b.id].buyBtn.disabled = !Resources.canAfford({ gold: b.goldCost });
+    }
   }
 
   // Show/hide rows based on current era
@@ -203,11 +208,13 @@ const HousingPanel = (() => {
       const buyBtn = document.createElement('button');
       buyBtn.className = 'overlay-buy-btn';
       buyBtn.textContent = 'Buy';
+      const fullCost = { gold: def.goldCost, ...def.costs };
+      buyBtn.disabled = !Resources.canAfford(fullCost);
       buyBtn.addEventListener('click', () => _onBuy(h));
 
       row.append(nameEl, capEl, goldEl, matEl, countEl, buyBtn);
       panelEl.appendChild(row);
-      rowEls[h.id] = { countEl, row };
+      rowEls[h.id] = { countEl, buyBtn, row };
     }
 
     document.getElementById('hud').appendChild(panelEl);
@@ -218,6 +225,14 @@ const HousingPanel = (() => {
     if (!People.buyHousing(h.era)) return;
     ownedCounts[h.id]++;
     rowEls[h.id].countEl.textContent = `Owned: ${ownedCounts[h.id]}`;
+    // Refresh all buy button affordability after purchase
+    for (const housing of ALL_HOUSING) {
+      if (rowEls[housing.id]?.buyBtn) {
+        const hDef = People.ERA_HOUSING[housing.era];
+        const cost = { gold: hDef.goldCost, ...hDef.costs };
+        rowEls[housing.id].buyBtn.disabled = !Resources.canAfford(cost);
+      }
+    }
   }
 
   function _refreshVisibility() {
@@ -266,8 +281,8 @@ const SupplyOverlay = (() => {
 
   function _towerPos(gx, gy) {
     return {
-      x: 60 + (gx / 23) * 840,
-      y: 60 + (gy / 26) * 960,
+      x: 60 + (gx / 47) * 840,
+      y: 60 + (gy / 53) * 960,
     };
   }
 

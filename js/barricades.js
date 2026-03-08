@@ -47,7 +47,7 @@ const Barricades = (() => {
     const cell = Map.getCell(gx, gy);
     if (!cell) return false;
     if (!Map.isDefenseZone(gx)) return false;
-    if (cell.state !== 'path') return false;
+    if (cell.state !== 'path' && cell.state !== 'open') return false;
     return !barricades.some(b => b.gx === gx && b.gy === gy);
   }
 
