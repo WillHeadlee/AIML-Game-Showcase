@@ -11,7 +11,7 @@ const Assets = (() => {
       era: 1, role: 'enemy',
       sfx: 'boar',
       anims: {
-        walk: { type:'frames', dir:'assets/Boar/boar-attacking', count:109, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        walk: { type:'frames', dir:'assets/Boar/boar-attacking-png', count:109, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
