@@ -1373,5 +1373,223 @@
     }
   }
 </script>
+
+<!-- ── Vombie ──────────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-title">Vombie</div>
+  <div class="stt-wrapper" id="vmb-wrapper">
+    <canvas id="vmb"></canvas>
+  </div>
+  <div id="vmb-state-label" style="font-size:13px;color:#aaa;letter-spacing:1px">STATE: ATTACK</div>
+  <div class="slider-row">
+    <span>Scale</span>
+    <input type="range" id="vmb-scale-slider" min="10" max="100" value="25" step="5">
+    <span id="vmb-scale-label">25%</span>
+  </div>
+</div>
+
+<script>
+  // ── Vombie ─────────────────────────────────────────────────────────────
+  const VMB_FW  = 1280;
+  const VMB_FH  = 720;
+  const VMB_FPS = 24;
+  const VMB_TOTAL = 161;
+
+  const vmbCanvas = document.getElementById('vmb');
+  vmbCanvas.width  = VMB_FW;
+  vmbCanvas.height = VMB_FH;
+  const vmbCtx = vmbCanvas.getContext('2d');
+  vmbCtx.imageSmoothingEnabled = true;
+
+  const vmbImgs = [];
+  let vmbReady  = 0;
+  for (let i = 1; i <= VMB_TOTAL; i++) {
+    const img = new Image();
+    img.src = `assets/Vombie/vombie-attacking/${String(i).padStart(4,'0')}.jpg`;
+    img.onload = () => { if (++vmbReady === VMB_TOTAL) requestAnimationFrame(vmbLoop); };
+    vmbImgs.push(img);
+  }
+
+  let vmbFrame   = 0;
+  let vmbElapsed = 0;
+  let vmbLast    = 0;
+
+  function applyVmbScale(pct) {
+    const s = pct / 100;
+    vmbCanvas.style.transform = `scale(${s})`;
+    vmbCanvas.style.transformOrigin = 'top left';
+    const wrapper = document.getElementById('vmb-wrapper');
+    wrapper.style.width  = Math.round(VMB_FW * s) + 'px';
+    wrapper.style.height = Math.round(VMB_FH * s) + 'px';
+    document.getElementById('vmb-scale-label').textContent = pct + '%';
+  }
+  applyVmbScale(25);
+
+  document.getElementById('vmb-scale-slider').addEventListener('input', e => {
+    applyVmbScale(Number(e.target.value));
+  });
+
+  function vmbLoop(ts) {
+    requestAnimationFrame(vmbLoop);
+    vmbElapsed += ts - vmbLast;
+    vmbLast     = ts;
+
+    if (vmbElapsed >= 1000 / VMB_FPS) {
+      vmbFrame    = (vmbFrame + 1) % VMB_TOTAL;
+      vmbElapsed -= 1000 / VMB_FPS;
+    }
+
+    if (vmbImgs[vmbFrame]?.complete) {
+      vmbCtx.clearRect(0, 0, VMB_FW, VMB_FH);
+      vmbCtx.drawImage(vmbImgs[vmbFrame], 0, 0, VMB_FW, VMB_FH);
+    }
+  }
+</script>
+
+<!-- ── Necro Zombie ───────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-title">Necro Zombie</div>
+  <div class="stt-wrapper" id="nz-wrapper">
+    <canvas id="nz"></canvas>
+  </div>
+  <div id="nz-state-label" style="font-size:13px;color:#aaa;letter-spacing:1px">STATE: ATTACK</div>
+  <div class="slider-row">
+    <span>Scale</span>
+    <input type="range" id="nz-scale-slider" min="10" max="100" value="25" step="5">
+    <span id="nz-scale-label">25%</span>
+  </div>
+</div>
+
+<script>
+  // ── Necro Zombie ───────────────────────────────────────────────────────
+  const NZ_FW  = 1280;
+  const NZ_FH  = 720;
+  const NZ_FPS = 24;
+  const NZ_TOTAL = 162;
+
+  const nzCanvas = document.getElementById('nz');
+  nzCanvas.width  = NZ_FW;
+  nzCanvas.height = NZ_FH;
+  const nzCtx = nzCanvas.getContext('2d');
+  nzCtx.imageSmoothingEnabled = true;
+
+  const nzImgs = [];
+  let nzReady  = 0;
+  for (let i = 1; i <= NZ_TOTAL; i++) {
+    const img = new Image();
+    img.src = `assets/Necro Zombie/necro-zombie-attacking/${String(i).padStart(4,'0')}.jpg`;
+    img.onload = () => { if (++nzReady === NZ_TOTAL) requestAnimationFrame(nzLoop); };
+    nzImgs.push(img);
+  }
+
+  let nzFrame   = 0;
+  let nzElapsed = 0;
+  let nzLast    = 0;
+
+  function applyNzScale(pct) {
+    const s = pct / 100;
+    nzCanvas.style.transform = `scale(${s})`;
+    nzCanvas.style.transformOrigin = 'top left';
+    const wrapper = document.getElementById('nz-wrapper');
+    wrapper.style.width  = Math.round(NZ_FW * s) + 'px';
+    wrapper.style.height = Math.round(NZ_FH * s) + 'px';
+    document.getElementById('nz-scale-label').textContent = pct + '%';
+  }
+  applyNzScale(25);
+
+  document.getElementById('nz-scale-slider').addEventListener('input', e => {
+    applyNzScale(Number(e.target.value));
+  });
+
+  function nzLoop(ts) {
+    requestAnimationFrame(nzLoop);
+    nzElapsed += ts - nzLast;
+    nzLast     = ts;
+
+    if (nzElapsed >= 1000 / NZ_FPS) {
+      nzFrame    = (nzFrame + 1) % NZ_TOTAL;
+      nzElapsed -= 1000 / NZ_FPS;
+    }
+
+    if (nzImgs[nzFrame]?.complete) {
+      nzCtx.clearRect(0, 0, NZ_FW, NZ_FH);
+      nzCtx.drawImage(nzImgs[nzFrame], 0, 0, NZ_FW, NZ_FH);
+    }
+  }
+</script>
+
+<!-- ── Grunt Zombie ──────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-title">Grunt Zombie</div>
+  <div class="stt-wrapper" id="gz-wrapper">
+    <canvas id="gz"></canvas>
+  </div>
+  <div id="gz-state-label" style="font-size:13px;color:#aaa;letter-spacing:1px">STATE: ATTACK</div>
+  <div class="slider-row">
+    <span>Scale</span>
+    <input type="range" id="gz-scale-slider" min="10" max="100" value="25" step="5">
+    <span id="gz-scale-label">25%</span>
+  </div>
+</div>
+
+<script>
+  // ── Grunt Zombie ───────────────────────────────────────────────────────
+  const GZ_FW  = 1280;
+  const GZ_FH  = 720;
+  const GZ_FPS = 24;
+  const GZ_TOTAL = 66;
+
+  const gzCanvas = document.getElementById('gz');
+  gzCanvas.width  = GZ_FW;
+  gzCanvas.height = GZ_FH;
+  const gzCtx = gzCanvas.getContext('2d');
+  gzCtx.imageSmoothingEnabled = true;
+
+  const gzImgs = [];
+  let gzReady  = 0;
+  for (let i = 1; i <= GZ_TOTAL; i++) {
+    const img = new Image();
+    img.src = `assets/Grunt Zombie/grunt-zombie-attacking/${String(i).padStart(4,'0')}.jpg`;
+    img.onload = () => { if (++gzReady === GZ_TOTAL) requestAnimationFrame(gzLoop); };
+    gzImgs.push(img);
+  }
+
+  let gzFrame   = 0;
+  let gzElapsed = 0;
+  let gzLast    = 0;
+
+  function applyGzScale(pct) {
+    const s = pct / 100;
+    gzCanvas.style.transform = `scale(${s})`;
+    gzCanvas.style.transformOrigin = 'top left';
+    const wrapper = document.getElementById('gz-wrapper');
+    wrapper.style.width  = Math.round(GZ_FW * s) + 'px';
+    wrapper.style.height = Math.round(GZ_FH * s) + 'px';
+    document.getElementById('gz-scale-label').textContent = pct + '%';
+  }
+  applyGzScale(25);
+
+  document.getElementById('gz-scale-slider').addEventListener('input', e => {
+    applyGzScale(Number(e.target.value));
+  });
+
+  function gzLoop(ts) {
+    requestAnimationFrame(gzLoop);
+    gzElapsed += ts - gzLast;
+    gzLast     = ts;
+
+    if (gzElapsed >= 1000 / GZ_FPS) {
+      gzFrame    = (gzFrame + 1) % GZ_TOTAL;
+      gzElapsed -= 1000 / GZ_FPS;
+    }
+
+    if (gzImgs[gzFrame]?.complete) {
+      gzCtx.clearRect(0, 0, GZ_FW, GZ_FH);
+      gzCtx.drawImage(gzImgs[gzFrame], 0, 0, GZ_FW, GZ_FH);
+    }
+  }
+</script>
+
+
 </body>
 </html>
