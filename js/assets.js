@@ -11,7 +11,7 @@ const Assets = (() => {
       era: 1, role: 'enemy',
       sfx: 'boar',
       anims: {
-        walk: { type:'frames', dir:'assets/Boar/boar-attacking', count:109, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        walk: { type:'frames', dir:'assets/Boar/boar-attacking-png', count:109, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
@@ -19,7 +19,7 @@ const Assets = (() => {
       era: 1, role: 'enemy',
       sfx: 'mammoth',
       anims: {
-        walk: { type:'frames', dir:'assets/Mammoth/mammoth-attacking', count:129, pad:4, prefix:'', ext:'jpg', fps:12, fw:1280, fh:720 },
+        walk: { type:'frames', dir:'assets/Mammoth/mammoth-attacking-png', count:129, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
@@ -27,7 +27,7 @@ const Assets = (() => {
       era: 1, role: 'enemy',
       sfx: 'tiger',
       anims: {
-        walk: { type:'frames', dir:'assets/Saber Tooth Tiger/saber-tooth-tiger-attacking', count:175, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        walk: { type:'frames', dir:'assets/Saber Tooth Tiger/saber-tooth-tiger-attacking-png', count:171, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
@@ -36,7 +36,7 @@ const Assets = (() => {
       era: 1, role: 'tower',
       sfx: 'club',
       anims: {
-        attack: { type:'frames', dir:'assets/Club Man/club-man-attacking', count:145, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Club Man/club-man-attacking-png', count:145, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
@@ -44,7 +44,7 @@ const Assets = (() => {
       era: 1, role: 'tower',
       sfx: 'stone',
       anims: {
-        attack: { type:'frames', dir:'assets/Stone Man/stone-man-attacking', count:124, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Stone Man/stone-man-attacking-png', count:124, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
@@ -52,29 +52,38 @@ const Assets = (() => {
       era: 1, role: 'tower',
       sfx: 'spear',
       anims: {
-        attack: { type:'frames', dir:'assets/Spear Man/spear-man-attacking', count:100, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Spear Man/spear-man-attacking-png', count:100, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
+
+    bowMan: {
+      era: 1, role: 'tower',
+      sfx: 'bow',
+      anims: {
+        attack: { type:'frames', dir:'assets/Bow Man/bow-man-attacking-png', count:102, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
+      },
+    },
+
 
     // ── Era II — Enemies ─────────────────────────────────────────────────
     witch: {
       era: 2, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Witch/witch-attacking', count:145, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        walk: { type:'frames', dir:'assets/Witch/witch-attacking-png', count:145, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
     vampire: {
       era: 2, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Vampire/vampire-attacking', count:109, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        walk: { type:'frames', dir:'assets/Vampire/vampire-attacking-png', count:109, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
     ghost: {
       era: 2, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Ghost/ghost-attacking', count:192, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        walk: { type:'frames', dir:'assets/Ghost/ghost-attacking-png', count:192, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
@@ -83,7 +92,7 @@ const Assets = (() => {
       era: 2, role: 'tower',
       sfx: 'sword',
       anims: {
-        attack: { type:'frames', dir:'assets/Sword Man/sword-man-attacking', count:123, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Sword Man/sword-man-attacking-png', count:123, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
@@ -91,14 +100,14 @@ const Assets = (() => {
       era: 2, role: 'tower',
       sfx: 'horse',
       anims: {
-        attack: { type:'frames', dir:'assets/Horse Man/horse-man-attacking', count:116, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Horse Man/horse-man-attacking-png', count:116, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
     crossbowMan: {
       era: 2, role: 'tower',
       anims: {
-        attack: { type:'frames', dir:'assets/Crossbow Man/crossbow-man-attacking', count:124, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Crossbow Man/crossbow-man-attacking-png', count:124, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
@@ -106,21 +115,21 @@ const Assets = (() => {
     pirateSword: {
       era: 3, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Sword Pirate/sword-pirate-attacking', count:114, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        walk: { type:'frames', dir:'assets/Sword Pirate/sword-pirate-attacking-png', count:114, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
     pirateRifle: {
       era: 3, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Flintlock Pirate/flintlock-pirate-attacking', count:146, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        walk: { type:'frames', dir:'assets/Flintlock Pirate/flintlock-pirate-attacking-png', count:146, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
     pirateBomb: {
       era: 3, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Bomb Pirate/bomb-pirate-attacking', count:164, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        walk: { type:'frames', dir:'assets/Bomb Pirate/bomb-pirate-attacking-png', count:164, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
@@ -128,7 +137,7 @@ const Assets = (() => {
     cutlassMan: {
       era: 3, role: 'tower',
       anims: {
-        attack: { type:'frames', dir:'assets/Cutlass Man/cutlass-man-attacking', count:140, pad:4, prefix:'', ext:'jpg', fps:24, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Cutlass Man/cutlass-man-attacking-png', count:140, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
@@ -136,6 +145,28 @@ const Assets = (() => {
       era: 3, role: 'tower',
       anims: {
         attack: { type:'frames', dir:'assets/Blunderbuss Man/blunderbuss-man-attacking-png', count:143, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    // ── Era II — Zombie Enemies ──────────────────────────────────────────────
+    gruntZombie: {
+      era: 2, role: 'enemy',
+      anims: {
+        walk: { type:'frames', dir:'assets/Grunt Zombie/grunt-zombie-attacking-png', count:66, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    necroZombie: {
+      era: 2, role: 'enemy',
+      anims: {
+        walk: { type:'frames', dir:'assets/Necro Zombie/necro-zombie-attacking-png', count:162, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    vombie: {
+      era: 2, role: 'enemy',
+      anims: {
+        walk: { type:'frames', dir:'assets/Vombie/vombie-attacking-png', count:161, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
       },
     },
 
