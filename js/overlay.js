@@ -6,24 +6,30 @@
 const TownBuildingsPanel = (() => {
 
   // All buildings across all eras — each era unlocks its pair on era advancement.
+  // Each building has 3 upgrade levels; cost scales per level.
   const ALL_BUILDINGS = [
-    { id: 'boneYard',        era: 1, name: 'Bone Yard',         produces: 'bone',      rate: 2, goldCost: 30 },
-    { id: 'lumberCamp',      era: 1, name: 'Lumber Camp',       produces: 'wood',      rate: 2, goldCost: 30 },
-    { id: 'stoneQuarry',     era: 2, name: 'Stone Quarry',      produces: 'stone',     rate: 2, goldCost: 45 },
-    { id: 'ironMine',        era: 2, name: 'Iron Mine',         produces: 'iron',      rate: 2, goldCost: 45 },
-    { id: 'timberMill',      era: 3, name: 'Timber Mill',       produces: 'timber',    rate: 2, goldCost: 60 },
-    { id: 'powderMill',      era: 3, name: 'Powder Mill',       produces: 'gunpowder', rate: 2, goldCost: 60 },
-    { id: 'steelFoundry',    era: 4, name: 'Steel Foundry',     produces: 'steel',     rate: 2, goldCost: 80 },
-    { id: 'oilRefinery',     era: 4, name: 'Oil Refinery',      produces: 'oil',       rate: 2, goldCost: 80 },
-    { id: 'alloyForge',      era: 5, name: 'Alloy Forge',       produces: 'alloy',     rate: 2, goldCost:100 },
-    { id: 'plasmaGenerator', era: 5, name: 'Plasma Generator',  produces: 'plasma',    rate: 2, goldCost:100 },
+    { id: 'boneYard',        era: 1, name: 'Bone Yard',         produces: 'bone',      rate: 2, goldCost:  30 },
+    { id: 'lumberCamp',      era: 1, name: 'Lumber Camp',       produces: 'wood',      rate: 2, goldCost:  30 },
+    { id: 'stoneQuarry',     era: 2, name: 'Stone Quarry',      produces: 'stone',     rate: 2, goldCost:  45 },
+    { id: 'ironMine',        era: 2, name: 'Iron Mine',         produces: 'iron',      rate: 2, goldCost:  45 },
+    { id: 'timberMill',      era: 3, name: 'Timber Mill',       produces: 'timber',    rate: 2, goldCost:  60 },
+    { id: 'powderMill',      era: 3, name: 'Powder Mill',       produces: 'gunpowder', rate: 2, goldCost:  60 },
+    { id: 'steelFoundry',    era: 4, name: 'Steel Foundry',     produces: 'steel',     rate: 2, goldCost:  80 },
+    { id: 'oilRefinery',     era: 4, name: 'Oil Refinery',      produces: 'oil',       rate: 2, goldCost:  80 },
+    { id: 'alloyForge',      era: 5, name: 'Alloy Forge',       produces: 'alloy',     rate: 2, goldCost: 100 },
+    { id: 'plasmaGenerator', era: 5, name: 'Plasma Generator',  produces: 'plasma',    rate: 2, goldCost: 100 },
   ];
 
-  const ownedCounts = {};
-  for (const b of ALL_BUILDINGS) ownedCounts[b.id] = 0;
+  const MAX_LEVEL = 3;
+  // levels[id] = 0 (unbuilt) … 3 (max)
+  const levels = {};
+  for (const b of ALL_BUILDINGS) levels[b.id] = 0;
 
   let panelEl  = null;
   const rowEls = {};
+
+  // Cost to go from current level → next: base × (level + 1)
+  function _nextCost(b) { return b.goldCost * (levels[b.id] + 1); }
 
   function init() {
     _buildTriggerButton();
@@ -66,42 +72,66 @@ const TownBuildingsPanel = (() => {
 
       const prodEl = document.createElement('span');
       prodEl.className = 'overlay-building-prod';
-      prodEl.textContent = `+${b.rate} ${b.produces}/s`;
+
+      const levelEl = document.createElement('span');
+      levelEl.className = 'overlay-building-count';
 
       const costEl = document.createElement('span');
       costEl.className = 'overlay-building-cost';
-      costEl.textContent = `${b.goldCost}g`;
 
-      const countEl = document.createElement('span');
-      countEl.className = 'overlay-building-count';
-      countEl.textContent = 'Owned: 0';
+      const actionBtn = document.createElement('button');
+      actionBtn.className = 'overlay-buy-btn';
+      actionBtn.addEventListener('click', () => _onUpgrade(b));
 
-      const buyBtn = document.createElement('button');
-      buyBtn.className = 'overlay-buy-btn';
-      buyBtn.textContent = 'Buy';
-      buyBtn.disabled = !Resources.canAfford({ gold: b.goldCost });
-      buyBtn.addEventListener('click', () => _onBuy(b));
-
-      row.append(nameEl, prodEl, costEl, countEl, buyBtn);
+      row.append(nameEl, prodEl, levelEl, costEl, actionBtn);
       panelEl.appendChild(row);
-      rowEls[b.id] = { countEl, buyBtn, row };
+      rowEls[b.id] = { row, prodEl, levelEl, costEl, actionBtn };
+      _refreshRow(b);
     }
 
     document.getElementById('hud').appendChild(panelEl);
     _refreshVisibility();
   }
 
-  function _onBuy(building) {
-    if (!Resources.spendGold(building.goldCost)) return;
-    ownedCounts[building.id]++;
-    Resources.addProduction(building.produces, building.rate);
-    // Also register supply production for Era 3+ buildings
-    if (building.era >= 3) Supply.addProduction(1);
-    rowEls[building.id].countEl.textContent = `Owned: ${ownedCounts[building.id]}`;
-    // Refresh all buy button affordability after purchase
-    for (const b of ALL_BUILDINGS) {
-      if (rowEls[b.id]?.buyBtn) rowEls[b.id].buyBtn.disabled = !Resources.canAfford({ gold: b.goldCost });
+  function _refreshRow(b) {
+    const lv  = levels[b.id];
+    const els = rowEls[b.id];
+    if (!els) return;
+
+    // Production: show current output, dim if unbuilt
+    els.prodEl.textContent = lv > 0
+      ? `+${b.rate * lv} ${b.produces}/s`
+      : `— ${b.produces}`;
+    els.prodEl.style.opacity = lv > 0 ? '1' : '0.4';
+
+    // Level pips  ●●○
+    const pips = Array.from({ length: MAX_LEVEL }, (_, i) => i < lv ? '●' : '○').join('');
+    els.levelEl.textContent = lv === 0 ? 'Unbuilt' : `Lv ${lv}  ${pips}`;
+    els.levelEl.style.color = lv >= MAX_LEVEL ? '#f0c040' : '';
+
+    // Cost & button
+    if (lv >= MAX_LEVEL) {
+      els.costEl.textContent = 'MAX';
+      els.actionBtn.textContent = 'Maxed';
+      els.actionBtn.disabled = true;
+    } else {
+      const cost = _nextCost(b);
+      els.costEl.textContent = `${cost}g`;
+      els.actionBtn.textContent = lv === 0 ? 'Build' : 'Upgrade';
+      els.actionBtn.disabled = !Resources.canAfford({ gold: cost });
     }
+  }
+
+  function _onUpgrade(building) {
+    const lv = levels[building.id];
+    if (lv >= MAX_LEVEL) return;
+    const cost = _nextCost(building);
+    if (!Resources.spendGold(cost)) return;
+    levels[building.id]++;
+    Resources.addProduction(building.produces, building.rate);
+    if (building.era >= 3) Supply.addProduction(1);
+    // Refresh all rows (affordability may have changed)
+    for (const b of ALL_BUILDINGS) _refreshRow(b);
   }
 
   // Show/hide rows based on current era, and refresh affordability
@@ -110,9 +140,7 @@ const TownBuildingsPanel = (() => {
     for (const b of ALL_BUILDINGS) {
       if (rowEls[b.id]) {
         rowEls[b.id].row.style.display = b.era <= era ? '' : 'none';
-        if (rowEls[b.id].buyBtn) {
-          rowEls[b.id].buyBtn.disabled = !Resources.canAfford({ gold: b.goldCost });
-        }
+        _refreshRow(b);
       }
     }
   }

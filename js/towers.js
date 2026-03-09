@@ -5,7 +5,7 @@
 const Towers = (() => {
 
   // ----- Tower definitions (all eras) -----
-  // rangeTiles doubled to maintain the same pixel range after CELL was halved (40→20).
+  // rangeTiles: tower attack range in grid cells (pixels = rangeTiles * GameMap.CELL).
   const DEFS = {
     // Era 1 — Prehistoric
     club:        { era:1, damage:20, attackSpeed:1.0, rangeTiles: 4, aoe:false, spriteKey:'clubMan',        label:'Club',         cost:{ bone: 5, wood:  3 }, peopleRequired:1 },

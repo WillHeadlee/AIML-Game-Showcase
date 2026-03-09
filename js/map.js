@@ -4,21 +4,21 @@
 
 const GameMap = (() => {
   // ----- Constants -----
-  const COLS = 96;
-  const ROWS = 54;
-  const CELL = 20; // px per cell
+  const COLS = 53;
+  const ROWS = 30;
+  const CELL = 36; // px per cell  (36×30=1080 exact; 53×36=1908 ≈1920)
 
-  // Defense zone: cols 0-47  (pixels 0–959)
-  // Settlement zone: cols 48-95 (pixels 960–1919)
-  const WALL_COL = 48;
+  // Defense zone: cols 0-26  (pixels 0–971)
+  // Settlement zone: cols 27-52 (pixels 972–1907)
+  const WALL_COL = 27;
 
   const DEFENSE_ZONE    = { minCol: 0,        maxCol: WALL_COL - 1 };
   const SETTLEMENT_ZONE = { minCol: WALL_COL,  maxCol: COLS - 1 };
 
   // ----- Coordinate helpers -----
   // gridToPixel returns the CENTER of the cell in canvas pixels.
-  //   gridToPixel(0,0)   → {x:10,  y:10}
-  //   gridToPixel(95,53) → {x:1910, y:1070}
+  //   gridToPixel(0,0)   → {x:15,  y:15}
+  //   gridToPixel(63,35) → {x:1905, y:1065}
   function gridToPixel(gx, gy) {
     return { x: CELL / 2 + gx * CELL, y: CELL / 2 + gy * CELL };
   }
@@ -68,12 +68,21 @@ const GameMap = (() => {
     });
   }
 
+  // resetPathCells — clears all 'path' cells back to 'open' in the defense zone.
+  function resetPathCells() {
+    for (let gy = 0; gy < ROWS; gy++) {
+      for (let gx = 0; gx < WALL_COL; gx++) {
+        if (grid[gy][gx].state === 'path') grid[gy][gx].state = 'open';
+      }
+    }
+  }
+
   return {
     COLS, ROWS, CELL, WALL_COL,
     DEFENSE_ZONE, SETTLEMENT_ZONE,
     grid,
     gridToPixel, pixelToGrid,
     getCell, setCell,
-    isDefenseZone, isSettlementZone, isAdjacentToPath,
+    isDefenseZone, isSettlementZone, isAdjacentToPath, resetPathCells,
   };
 })();

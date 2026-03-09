@@ -36,6 +36,7 @@ function init() {
   UI.init();
   TownBuildingsPanel.init();
   HousingPanel.init();
+  UI.adoptPanels();
   SupplyOverlay.init();
 
   // Wave complete — advance counter or era
@@ -94,8 +95,6 @@ function init() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       UI.closeAll();
-      TownBuildingsPanel.close();
-      HousingPanel.close();
     }
   });
 
@@ -168,6 +167,128 @@ function _devSwitchEra(era) {
   UI.update(state);
 }
 
+// ----- Path Editor (dev tool) -----
+function _initPathEditor() {
+  const devPanel = document.getElementById('dev-panel');
+
+  // Separator
+  const sep = document.createElement('span');
+  sep.textContent = '|';
+  sep.style.color = '#555';
+  devPanel.appendChild(sep);
+
+  // Toggle button
+  const editBtn = document.createElement('button');
+  editBtn.textContent = 'Edit Path';
+  editBtn.style.cssText = `
+    padding: 3px 10px; font-family: monospace; font-size: 13px;
+    background: #333; color: #ccc; border: 1px solid #666;
+    border-radius: 3px; cursor: pointer;
+  `;
+  devPanel.appendChild(editBtn);
+
+  // Copy button
+  const copyBtn = document.createElement('button');
+  copyBtn.textContent = 'Copy Path';
+  copyBtn.style.cssText = `
+    padding: 3px 10px; font-family: monospace; font-size: 13px;
+    background: #1a2a3a; color: #8cf; border: 1px solid #4af;
+    border-radius: 3px; cursor: pointer; display: none;
+  `;
+  devPanel.appendChild(copyBtn);
+
+  // Invisible overlay layer inside game-wrapper for node divs
+  const nodeLayer = document.createElement('div');
+  nodeLayer.style.cssText = `
+    position: absolute; top: 0; left: 0;
+    width: 1920px; height: 1080px;
+    pointer-events: none; z-index: 50;
+    display: none;
+  `;
+  document.getElementById('game-wrapper').appendChild(nodeLayer);
+
+  let editing = false;
+  let dragging = null; // { nodeEl, index }
+
+  function gameCoords(screenX, screenY) {
+    const rect = document.getElementById('game-wrapper').getBoundingClientRect();
+    return {
+      x: Math.max(0, Math.min(1920, (screenX - rect.left) * (1920 / rect.width))),
+      y: Math.max(0, Math.min(1080, (screenY - rect.top)  * (1080 / rect.height))),
+    };
+  }
+
+  function rebuildNodes() {
+    nodeLayer.innerHTML = '';
+    Path.WAYPOINTS.forEach((wp, i) => {
+      const node = document.createElement('div');
+      node.style.cssText = `
+        position: absolute;
+        width: 22px; height: 22px; border-radius: 50%;
+        background: rgba(255,210,60,0.92); border: 2px solid #fff;
+        box-shadow: 0 0 10px rgba(0,0,0,0.85), 0 0 6px rgba(255,200,50,0.6);
+        cursor: grab; transform: translate(-50%,-50%);
+        pointer-events: auto; user-select: none;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 9px; font-family: monospace; font-weight: bold; color: #000;
+      `;
+      node.textContent = i;
+      node.style.left = `${wp.x}px`;
+      node.style.top  = `${wp.y}px`;
+      node.addEventListener('mousedown', e => {
+        e.preventDefault();
+        dragging = { nodeEl: node, index: i };
+        node.style.cursor = 'grabbing';
+        node.style.background = 'rgba(255,120,40,0.95)';
+      });
+      nodeLayer.appendChild(node);
+    });
+  }
+
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const { x, y } = gameCoords(e.clientX, e.clientY);
+    Path.WAYPOINTS[dragging.index].x = x;
+    Path.WAYPOINTS[dragging.index].y = y;
+    dragging.nodeEl.style.left = `${x}px`;
+    dragging.nodeEl.style.top  = `${y}px`;
+    Path.refreshLUT();
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging.nodeEl.style.cursor = 'grab';
+    dragging.nodeEl.style.background = 'rgba(255,210,60,0.92)';
+    dragging = null;
+    Path.refresh();
+  });
+
+  editBtn.addEventListener('click', () => {
+    editing = !editing;
+    editBtn.style.background  = editing ? '#1a3a1a' : '#333';
+    editBtn.style.borderColor = editing ? '#4a4'    : '#666';
+    editBtn.style.color       = editing ? '#8f8'    : '#ccc';
+    nodeLayer.style.display   = editing ? '' : 'none';
+    copyBtn.style.display     = editing ? '' : 'none';
+    if (editing) rebuildNodes();
+  });
+
+  copyBtn.addEventListener('click', () => {
+    const lines = Path.WAYPOINTS.map(wp =>
+      `    { x: ${Math.round(wp.x)}, y: ${Math.round(wp.y)} }`
+    ).join(',\n');
+    const text = `[\n${lines}\n]`;
+    navigator.clipboard.writeText(text).then(() => {
+      copyBtn.textContent = 'Copied!';
+      copyBtn.style.background = '#1a3a1a';
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy Path';
+        copyBtn.style.background = '#1a2a3a';
+      }, 1800);
+    });
+  });
+}
+
 // ----- Main loop -----
 function loop(timestamp) {
   const delta = Math.min(timestamp - lastTimestamp, 100);
@@ -198,6 +319,7 @@ function render() {
 
   Renderer.drawZones();
   Renderer.drawGrid();
+  Renderer.drawPath();
   Renderer.drawWall();
   Renderer.drawBarricades();
   Renderer.drawTowers();

@@ -1,14 +1,22 @@
 /* ============================================================
    path.js — Enemy path: Catmull-Rom spline, arc-length queries
+   Waypoints are mutable objects — the PathEditor manipulates them
+   directly and calls Path.refreshLUT() / Path.refresh().
    ============================================================ */
 
 const Path = (() => {
-  // Straight horizontal path from the left edge to the wall gate.
-  const WAYPOINTS = [
-    { x:   0, y: 565 },   // P0 — left edge entry
-    { x: 320, y: 565 },   // P1
-    { x: 640, y: 565 },   // P2
-    { x: 958, y: 565 },   // P3 — gate entry (wall col 24)
+  // Active waypoints — mutated in place by the path editor.
+  const _waypoints = [
+    { x:   0, y: 596 },
+    { x: 136, y: 512 },
+    { x: 278, y: 153 },
+    { x: 396, y: 276 },
+    { x: 254, y: 860 },
+    { x: 502, y: 849 },
+    { x: 590, y: 288 },
+    { x: 771, y: 282 },
+    { x: 763, y: 546 },
+    { x: 957, y: 568 },
   ];
 
   // Arc-length lookup table entry: { seg, t, x, y, dist }
@@ -17,7 +25,6 @@ const Path = (() => {
 
   // ----- Catmull-Rom maths -----
 
-  // Returns position on segment [p1→p2], with p0 and p3 as tangent guides.
   function catmullRomPos(p0, p1, p2, p3, t) {
     const t2 = t * t, t3 = t2 * t;
     return {
@@ -32,7 +39,6 @@ const Path = (() => {
     };
   }
 
-  // Returns derivative (tangent) on the segment at t.
   function catmullRomDeriv(p0, p1, p2, p3, t) {
     const t2 = t * t;
     return {
@@ -45,15 +51,13 @@ const Path = (() => {
     };
   }
 
-  // Gets the 4 control points for segment index `seg`.
-  // Clamps to endpoints for edge segments.
   function controlPoints(seg) {
-    const n = WAYPOINTS.length;
+    const n = _waypoints.length;
     return {
-      p0: WAYPOINTS[Math.max(0, seg - 1)],
-      p1: WAYPOINTS[seg],
-      p2: WAYPOINTS[Math.min(n - 1, seg + 1)],
-      p3: WAYPOINTS[Math.min(n - 1, seg + 2)],
+      p0: _waypoints[Math.max(0, seg - 1)],
+      p1: _waypoints[seg],
+      p2: _waypoints[Math.min(n - 1, seg + 1)],
+      p3: _waypoints[Math.min(n - 1, seg + 2)],
     };
   }
 
@@ -61,12 +65,10 @@ const Path = (() => {
 
   function buildLUT() {
     const SAMPLES_PER_SEG = 400;
-    const numSegs = WAYPOINTS.length - 1;
+    const numSegs = _waypoints.length - 1;
     lut = [];
-
     let dist = 0;
     let prev = null;
-
     for (let seg = 0; seg < numSegs; seg++) {
       const { p0, p1, p2, p3 } = controlPoints(seg);
       for (let s = 0; s <= SAMPLES_PER_SEG; s++) {
@@ -83,8 +85,6 @@ const Path = (() => {
     totalLength = dist;
   }
 
-  // Binary-search LUT for the entry nearest to arc-distance d.
-  // Returns [loIdx, hiIdx].
   function lutSearch(d) {
     let lo = 0, hi = lut.length - 1;
     while (lo < hi - 1) {
@@ -96,11 +96,8 @@ const Path = (() => {
 
   // ----- Public API -----
 
-  function calculateTotalLength() {
-    return totalLength;
-  }
+  function calculateTotalLength() { return totalLength; }
 
-  // Returns {x, y} on the spline at arc-distance d from the start.
   function getPositionAtDistance(d) {
     if (d <= 0) return { x: lut[0].x, y: lut[0].y };
     if (d >= totalLength) {
@@ -111,23 +108,17 @@ const Path = (() => {
     const a = lut[lo], b = lut[hi];
     const span = b.dist - a.dist;
     const frac = span > 0 ? (d - a.dist) / span : 0;
-    return {
-      x: a.x + (b.x - a.x) * frac,
-      y: a.y + (b.y - a.y) * frac,
-    };
+    return { x: a.x + (b.x - a.x) * frac, y: a.y + (b.y - a.y) * frac };
   }
 
-  // Returns a unit direction vector {x, y} at arc-distance d.
   function getTangentAtDistance(d) {
     if (d < 0) d = 0;
     if (d > totalLength) d = totalLength;
-
     const [lo, hi] = lutSearch(Math.min(d, totalLength - 0.01));
     const a = lut[lo], b = lut[hi];
     const span = b.dist - a.dist;
     const frac = span > 0 ? (d - a.dist) / span : 0;
     const t    = a.t + (b.t - a.t) * frac;
-
     const { p0, p1, p2, p3 } = controlPoints(a.seg);
     const deriv = catmullRomDeriv(p0, p1, p2, p3, t);
     const len   = Math.sqrt(deriv.x * deriv.x + deriv.y * deriv.y);
@@ -135,21 +126,14 @@ const Path = (() => {
     return { x: deriv.x / len, y: deriv.y / len };
   }
 
-  // Marks all defense-zone grid cells whose center is within 2 tiles (80px)
-  // of the spline center line as state='path'.  Called once on init.
   function markPathCells() {
-    const HALF_WIDTH = GameMap.CELL * 2.5; // 50px — extends path zone one extra row below center
-
-    // Pre-sample path points densely
+    const HALF_WIDTH = GameMap.CELL * 1.9;
     const pts = [];
-    for (let d = 0; d <= totalLength; d += 4) {
-      pts.push(getPositionAtDistance(d));
-    }
-
+    for (let d = 0; d <= totalLength; d += 4) pts.push(getPositionAtDistance(d));
     for (let gy = 0; gy < GameMap.ROWS; gy++) {
       for (let gx = 0; gx < GameMap.WALL_COL; gx++) {
-        const cx = GameMap.CELL / 2 + gx * GameMap.CELL;  // cell center x
-        const cy = GameMap.CELL / 2 + gy * GameMap.CELL;  // cell center y
+        const cx = GameMap.CELL / 2 + gx * GameMap.CELL;
+        const cy = GameMap.CELL / 2 + gy * GameMap.CELL;
         for (const pt of pts) {
           const dx = cx - pt.x, dy = cy - pt.y;
           if (dx * dx + dy * dy <= HALF_WIDTH * HALF_WIDTH) {
@@ -161,15 +145,27 @@ const Path = (() => {
     }
   }
 
+  // refreshLUT — fast rebuild during drag (no cell update).
+  function refreshLUT() { buildLUT(); }
+
+  // refresh — full reset + rebuild + remark (call on drag end).
+  function refresh() {
+    GameMap.resetPathCells();
+    buildLUT();
+    markPathCells();
+  }
+
   // ----- Init -----
   buildLUT();
   markPathCells();
 
   return {
-    WAYPOINTS,
+    get WAYPOINTS() { return _waypoints; },
     calculateTotalLength,
     getPositionAtDistance,
     getTangentAtDistance,
     markPathCells,
+    refreshLUT,
+    refresh,
   };
 })();

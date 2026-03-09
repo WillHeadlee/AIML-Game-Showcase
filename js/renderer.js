@@ -43,11 +43,12 @@ const Renderer = (() => {
     const STEP  = 6;
 
     // Filled semi-transparent corridor
+    const PATH_HW = GameMap.CELL * 1.9; // matches path.js markPathCells HALF_WIDTH
     ctx.beginPath();
     for (let d = 0; d <= total; d += STEP) {
       const pos = Path.getPositionAtDistance(d);
       const tan = Path.getTangentAtDistance(d);
-      const nx  = -tan.y * 40, ny = tan.x * 40; // normal, 40px half-width
+      const nx  = -tan.y * PATH_HW, ny = tan.x * PATH_HW;
       if (d === 0) {
         ctx.moveTo(pos.x + nx, pos.y + ny);
       } else {
@@ -57,7 +58,7 @@ const Renderer = (() => {
     for (let d = total; d >= 0; d -= STEP) {
       const pos = Path.getPositionAtDistance(d);
       const tan = Path.getTangentAtDistance(d);
-      const nx  = -tan.y * 40, ny = tan.x * 40;
+      const nx  = -tan.y * PATH_HW, ny = tan.x * PATH_HW;
       ctx.lineTo(pos.x - nx, pos.y - ny);
     }
     ctx.closePath();
