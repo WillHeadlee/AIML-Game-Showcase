@@ -32,7 +32,7 @@ const Barricades = (() => {
       this.maxHp = DEF.hp;
       this.dead  = false;
 
-      const c  = Map.gridToPixel(gx, gy);
+      const c  = GameMap.gridToPixel(gx, gy);
       this.cx  = c.x;
       this.cy  = c.y;
     }
@@ -44,9 +44,9 @@ const Barricades = (() => {
   }
 
   function isValid(gx, gy) {
-    const cell = Map.getCell(gx, gy);
+    const cell = GameMap.getCell(gx, gy);
     if (!cell) return false;
-    if (!Map.isDefenseZone(gx)) return false;
+    if (!GameMap.isDefenseZone(gx)) return false;
     if (cell.state !== 'path' && cell.state !== 'open') return false;
     return !barricades.some(b => b.gx === gx && b.gy === gy);
   }

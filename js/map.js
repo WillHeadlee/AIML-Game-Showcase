@@ -2,7 +2,7 @@
    map.js — Grid data model, zone constants, coordinate helpers
    ============================================================ */
 
-const Map = (() => {
+const GameMap = (() => {
   // ----- Constants -----
   const COLS = 96;
   const ROWS = 54;

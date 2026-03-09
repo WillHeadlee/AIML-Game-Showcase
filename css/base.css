@@ -2,6 +2,8 @@
    base.css — CSS reset + era color palettes
    ============================================================ */
 
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
 /* ----- Reset ----- */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -25,9 +27,6 @@ html, body {
   height: 1080px;
   transform-origin: 0 0;
 }
-
-/* ----- Font import ----- */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 
 /* ----- Era Color Palettes ----- */
 /*

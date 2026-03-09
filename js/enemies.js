@@ -5,7 +5,7 @@
 const Enemies = (() => {
 
   // ----- Enemy definitions -----
-  // speedTiles: tiles per second (1 tile = 20px, i.e. Map.CELL)
+  // speedTiles: tiles per second (1 tile = 20px, i.e. GameMap.CELL)
   // goldRange: [min, max] reward on kill (used in Step 9)
   const DEFS = {
     // Era 1 — Prehistoric
@@ -46,7 +46,7 @@ const Enemies = (() => {
       this.type       = type;
       this.health     = def.health;
       this.maxHealth  = def.health;
-      this.speed      = def.speedTiles * Map.CELL;  // px/s
+      this.speed      = def.speedTiles * GameMap.CELL;  // px/s
       this.townDamage = def.townDamage;
       this.spriteKey  = def.spriteKey;
       this.drawW      = def.drawW;

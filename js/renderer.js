@@ -28,7 +28,7 @@ const Renderer = (() => {
     if (mapBg && mapBg.complete && mapBg.naturalWidth > 0) {
       ctx.drawImage(mapBg, 0, 0, 1920, 1080);
     } else {
-      const wallX = Map.WALL_COL * Map.CELL;
+      const wallX = GameMap.WALL_COL * GameMap.CELL;
       const theme = _theme();
       ctx.fillStyle = theme.defenseZone;
       ctx.fillRect(0, 0, wallX, 1080);
@@ -90,26 +90,26 @@ const Renderer = (() => {
 
   // ----- Grid cells -----
   function drawGrid() {
-    for (let gy = 0; gy < Map.ROWS; gy++) {
-      for (let gx = 0; gx < Map.COLS; gx++) {
-        const cell = Map.getCell(gx, gy);
-        const px = gx * Map.CELL;
-        const py = gy * Map.CELL - 5;
+    for (let gy = 0; gy < GameMap.ROWS; gy++) {
+      for (let gx = 0; gx < GameMap.COLS; gx++) {
+        const cell = GameMap.getCell(gx, gy);
+        const px = gx * GameMap.CELL;
+        const py = gy * GameMap.CELL - 5;
 
         switch (cell.state) {
           case 'open':
             ctx.fillStyle = 'rgba(255,255,255,0.025)';
-            ctx.fillRect(px, py, Map.CELL, Map.CELL);
+            ctx.fillRect(px, py, GameMap.CELL, GameMap.CELL);
             ctx.strokeStyle = 'rgba(255,255,255,0.045)';
             ctx.lineWidth = 0.5;
-            ctx.strokeRect(px + 0.5, py + 0.5, Map.CELL - 1, Map.CELL - 1);
+            ctx.strokeRect(px + 0.5, py + 0.5, GameMap.CELL - 1, GameMap.CELL - 1);
             break;
           case 'path':
             // invisible — path is shown by the map image
             break;
           case 'wall':
             ctx.fillStyle = 'rgba(100,80,50,0.25)';
-            ctx.fillRect(px, py, Map.CELL, Map.CELL);
+            ctx.fillRect(px, py, GameMap.CELL, GameMap.CELL);
             break;
           case 'blocked':
             break;
@@ -120,7 +120,7 @@ const Renderer = (() => {
 
   // ----- Center dividing wall -----
   function drawWall() {
-    const wallX = Map.WALL_COL * Map.CELL;
+    const wallX = GameMap.WALL_COL * GameMap.CELL;
 
     const grad = ctx.createLinearGradient(wallX - 4, 0, wallX + 16, 0);
     grad.addColorStop(0,   'rgba(0,0,0,0.7)');
@@ -210,7 +210,7 @@ const Renderer = (() => {
     for (const t of Towers.getAll()) {
       const cx = t.cx;
       const cy = t.cy - 5;  // align with grid -5px shift
-      const r  = Map.CELL * 0.44;
+      const r  = GameMap.CELL * 0.44;
 
       const animEntry = Assets.getAnim(t.spriteKey, 'attack');
 
@@ -238,7 +238,7 @@ const Renderer = (() => {
         ctx.stroke();
 
         ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.font = `bold ${Map.CELL * 0.38}px monospace`;
+        ctx.font = `bold ${GameMap.CELL * 0.38}px monospace`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(t.label[0], cx, cy);
@@ -251,7 +251,7 @@ const Renderer = (() => {
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = 'rgba(200,200,200,0.7)';
-        ctx.font = `bold ${Map.CELL * 0.3}px monospace`;
+        ctx.font = `bold ${GameMap.CELL * 0.3}px monospace`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('Z', cx, cy);
@@ -262,20 +262,20 @@ const Renderer = (() => {
   // ----- Barricades -----
   function drawBarricades() {
     for (const b of Barricades.getAll()) {
-      const px = b.gx * Map.CELL;
-      const py = b.gy * Map.CELL - 5;  // align with grid -5px shift
-      const cy = py + Map.CELL / 2;
+      const px = b.gx * GameMap.CELL;
+      const py = b.gy * GameMap.CELL - 5;  // align with grid -5px shift
+      const cy = py + GameMap.CELL / 2;
 
       ctx.fillStyle = '#7a4820';
-      ctx.fillRect(px + 3, cy - 7, Map.CELL - 6, 14);
+      ctx.fillRect(px + 3, cy - 7, GameMap.CELL - 6, 14);
       ctx.fillStyle = 'rgba(200,150,80,0.25)';
-      ctx.fillRect(px + 3, cy - 7, Map.CELL - 6, 5);
+      ctx.fillRect(px + 3, cy - 7, GameMap.CELL - 6, 5);
       ctx.strokeStyle = 'rgba(210,155,70,0.8)';
       ctx.lineWidth   = 1.5;
-      ctx.strokeRect(px + 3, cy - 7, Map.CELL - 6, 14);
+      ctx.strokeRect(px + 3, cy - 7, GameMap.CELL - 6, 14);
 
       if (b.hp < b.maxHp) {
-        const barW = Map.CELL - 6;
+        const barW = GameMap.CELL - 6;
         const barX = px + 3;
         const barY = py + 3;
         ctx.fillStyle = '#400';
@@ -295,21 +295,21 @@ const Renderer = (() => {
     const valid = selectedType === 'barricade'
       ? Barricades.isValid(gx, gy)
       : Towers.isValid(gx, gy);
-    const px = gx * Map.CELL;
-    const py = gy * Map.CELL - 5;  // align with grid -5px shift
+    const px = gx * GameMap.CELL;
+    const py = gy * GameMap.CELL - 5;  // align with grid -5px shift
 
     ctx.fillStyle   = valid ? 'rgba(0,220,80,0.28)'  : 'rgba(220,40,40,0.28)';
     ctx.strokeStyle = valid ? 'rgba(0,220,80,0.85)'  : 'rgba(220,40,40,0.85)';
     ctx.lineWidth   = 2;
-    ctx.fillRect(px, py, Map.CELL, Map.CELL);
-    ctx.strokeRect(px + 1, py + 1, Map.CELL - 2, Map.CELL - 2);
+    ctx.fillRect(px, py, GameMap.CELL, GameMap.CELL);
+    ctx.strokeRect(px + 1, py + 1, GameMap.CELL - 2, GameMap.CELL - 2);
 
     // Range preview circle for towers
     const towerDef = selectedType !== 'barricade' ? Towers.DEFS[selectedType] : null;
     if (towerDef) {
-      const cx = gx * Map.CELL + Map.CELL / 2;
-      const cy = gy * Map.CELL - 5 + Map.CELL / 2;
-      const r  = towerDef.rangeTiles * Map.CELL;
+      const cx = gx * GameMap.CELL + GameMap.CELL / 2;
+      const cy = gy * GameMap.CELL - 5 + GameMap.CELL / 2;
+      const r  = towerDef.rangeTiles * GameMap.CELL;
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.fillStyle   = valid ? 'rgba(0,220,80,0.07)' : 'rgba(220,40,40,0.07)';

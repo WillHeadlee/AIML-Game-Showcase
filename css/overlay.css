@@ -5,14 +5,13 @@
 /* ----- Buildings panel ----- */
 #overlay-buildings {
   position: absolute;
-  top: 50%;
-  left: 30%;
-  transform: translate(-50%, -50%);
-  width: 460px;
+  top: 220px;
+  right: 24px;
+  width: 560px;
   background: rgba(10, 6, 2, 0.94);
   border: 1px solid var(--era-highlight, #CD853F);
   border-radius: 6px;
-  padding: 24px 28px 20px;
+  padding: 28px 32px 24px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.88);
   pointer-events: auto;
   z-index: 20;
@@ -21,7 +20,7 @@
 /* ----- Shared overlay components ----- */
 .overlay-title {
   font-family: 'Cinzel', 'Georgia', serif;
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.14em;
   color: var(--era-text, #D2B48C);
@@ -49,8 +48,8 @@
 .overlay-building-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 0;
+  gap: 14px;
+  padding: 13px 0;
   border-bottom: 1px solid rgba(180, 130, 50, 0.18);
 }
 .overlay-building-row:last-child { border-bottom: none; padding-bottom: 0; }
@@ -58,23 +57,23 @@
 .overlay-building-name {
   flex: 1;
   font-family: 'Cinzel', 'Georgia', serif;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--era-text, #D2B48C);
 }
 
 .overlay-building-prod {
   font-family: monospace;
-  font-size: 12px;
+  font-size: 14px;
   color: #7ec860;
-  min-width: 82px;
+  min-width: 96px;
 }
 
 .overlay-building-cost {
   font-family: monospace;
-  font-size: 12px;
+  font-size: 14px;
   color: #f0c040;
-  min-width: 32px;
+  min-width: 40px;
   text-align: right;
 }
 
@@ -82,13 +81,13 @@
   font-family: monospace;
   font-size: 11px;
   color: rgba(210, 180, 140, 0.45);
-  min-width: 60px;
+  min-width: 72px;
 }
 
 .overlay-buy-btn {
-  padding: 5px 14px;
+  padding: 8px 20px;
   font-family: 'Cinzel', 'Georgia', serif;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--era-text, #D2B48C);
@@ -107,14 +106,13 @@
 /* ----- Housing panel ----- */
 #overlay-housing {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 440px;
+  top: 220px;
+  right: 24px;
+  width: 560px;
   background: rgba(10, 6, 2, 0.94);
   border: 1px solid var(--era-highlight, #CD853F);
   border-radius: 6px;
-  padding: 24px 28px 20px;
+  padding: 28px 32px 24px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.88);
   pointer-events: auto;
   z-index: 20;
@@ -123,10 +121,9 @@
 /* ----- Town panel (upgrade / repair) — Step 17 ----- */
 #overlay-town-panel {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 340px;
+  top: 220px;
+  right: 24px;
+  width: 400px;
   background: rgba(10, 6, 2, 0.94);
   border: 1px solid var(--era-highlight, #CD853F);
   border-radius: 6px;

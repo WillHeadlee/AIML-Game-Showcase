@@ -86,18 +86,12 @@ const UI = (() => {
     townButtons = document.createElement('div');
     townButtons.id = 'hud-town-buttons';
 
-    const upgradeBtn = document.createElement('button');
-    upgradeBtn.className = 'hud-town-btn';
-    upgradeBtn.textContent = 'Upgrade Town';
-    upgradeBtn.addEventListener('click', () => _openTownPanel('upgrade'));
+    const townHallBtn = document.createElement('button');
+    townHallBtn.className = 'hud-town-btn';
+    townHallBtn.textContent = 'Town Hall';
+    townHallBtn.addEventListener('click', () => _openTownPanel('upgrade'));
 
-    const repairBtn = document.createElement('button');
-    repairBtn.className = 'hud-town-btn';
-    repairBtn.textContent = 'Repair Town';
-    repairBtn.addEventListener('click', () => _openTownPanel('repair'));
-
-    townButtons.appendChild(upgradeBtn);
-    townButtons.appendChild(repairBtn);
+    townButtons.appendChild(townHallBtn);
     hud.appendChild(townButtons);
 
     // Build mode toggle
@@ -183,7 +177,6 @@ const UI = (() => {
 
   function onStartWave() {
     if (state.phase !== 'prep') return;
-    buildMode = false;
     _closeTownPanel();
     state.phase = 'wave';
     Waves.startWave(state.currentEra, state.currentWave);
@@ -222,11 +215,11 @@ const UI = (() => {
   }
 
   function onCanvasMouseMove(e) {
-    if (!buildMode || state.phase !== 'prep') { hoverCell = null; return; }
+    if (!buildMode || state.phase === 'gameover') { hoverCell = null; return; }
     const { cx, cy } = _canvasCoords(e);
-    const gx = Math.floor(cx / Map.CELL);
-    const gy = Math.floor((cy + 5) / Map.CELL);  // +5 to account for -5px grid shift
-    if (gx < 0 || gx >= Map.COLS || gy < 0 || gy >= Map.ROWS) {
+    const gx = Math.floor(cx / GameMap.CELL);
+    const gy = Math.floor((cy + 5) / GameMap.CELL);  // +5 to account for -5px grid shift
+    if (gx < 0 || gx >= GameMap.COLS || gy < 0 || gy >= GameMap.ROWS) {
       hoverCell = null;
     } else {
       hoverCell = { gx, gy };
@@ -244,11 +237,11 @@ const UI = (() => {
       return;
     }
 
-    const gx = Math.floor(cx / Map.CELL);
-    const gy = Math.floor((cy + 5) / Map.CELL);  // +5 to account for -5px grid shift
+    const gx = Math.floor(cx / GameMap.CELL);
+    const gy = Math.floor((cy + 5) / GameMap.CELL);  // +5 to account for -5px grid shift
 
     // Build mode
-    if (buildMode && state.phase === 'prep') {
+    if (buildMode && state.phase !== 'gameover') {
       let result;
       if (selectedType === 'barricade') {
         result = Barricades.place(gx, gy);
@@ -299,10 +292,10 @@ const UI = (() => {
   // ----- update — sync all HUD elements to state -----
   function update(s) {
     if (eraWaveEl) eraWaveEl.textContent = `Era ${s.currentEra} \u2014 Wave ${s.currentWave}`;
-    const isPrep = s.phase === 'prep';
-    if (townButtons) townButtons.style.display = isPrep ? '' : 'none';
-    if (buildModeBtn) buildModeBtn.style.display = isPrep ? '' : 'none';
-    if (!isPrep) { buildMode = false; hoverCell = null; }
+    const isGameOver = s.phase === 'gameover';
+    if (townButtons) townButtons.style.display = isGameOver ? 'none' : '';
+    if (buildModeBtn) buildModeBtn.style.display = isGameOver ? 'none' : '';
+    if (isGameOver) { buildMode = false; hoverCell = null; }
     _refreshBuildModeBtn();
     _rebuildTowerSelector();
     _refreshTowerSelector();
@@ -539,6 +532,8 @@ const UI = (() => {
   function _openTownPanel(focus) {
     _closeTowerPanel();
     _closeBarricadePanel();
+    TownBuildingsPanel.close();
+    HousingPanel.close();
     _buildTownPanel(focus);
   }
 
@@ -632,5 +627,11 @@ const UI = (() => {
     resourcesEl.addEventListener('animationend', () => resourcesEl.classList.remove('flash'), { once: true });
   }
 
-  return { init, renderHUD, renderStartWaveButton, update, enableStartButton, getBuildState };
+  function closeAll() {
+    _closeTowerPanel();
+    _closeBarricadePanel();
+    _closeTownPanel();
+  }
+
+  return { init, renderHUD, renderStartWaveButton, update, enableStartButton, getBuildState, closeAll };
 })();

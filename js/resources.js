@@ -92,5 +92,13 @@ const Resources = (() => {
     }
   }
 
-  return { addGold, spendGold, getGold, addResource, canAfford, spendResources, getStockpile, addProduction, update };
+  // devFill() — sets gold and all stockpiles to abundant amounts for testing.
+  function devFill() {
+    gold = 9999;
+    for (const key of Object.keys(stockpiles)) {
+      stockpiles[key] = 999;
+    }
+  }
+
+  return { addGold, spendGold, getGold, addResource, canAfford, spendResources, getStockpile, addProduction, update, devFill };
 })();

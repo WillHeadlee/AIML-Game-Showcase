@@ -5,7 +5,7 @@
 // Supply is only active from Era 3. In Eras 1–2, no production is registered
 // so getTotalProduction() returns 0 and all supplyHealth stays at 0.
 
-const Supply = (() => {
+var Supply = (() => {
 
   const PRIORITIES = ['low', 'medium', 'high'];
 

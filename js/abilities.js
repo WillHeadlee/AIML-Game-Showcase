@@ -64,7 +64,7 @@ const Abilities = (() => {
 
   // AoE centered on clicked tile
   function _effectAoeClick(def, px, py) {
-    const radiusPx = (def.radius ?? 2) * Map.CELL;
+    const radiusPx = (def.radius ?? 2) * GameMap.CELL;
     for (const e of Enemies.getAll()) {
       if (e.dead || e.reached) continue;
       const pos = e.getPosition();
@@ -85,7 +85,7 @@ const Abilities = (() => {
     }
     if (!nearest) return;
     nearest.takeDamage(def.damage);
-    const splashPx = (def.splashRadius ?? 2) * Map.CELL;
+    const splashPx = (def.splashRadius ?? 2) * GameMap.CELL;
     const nPos = nearest.getPosition();
     for (const e of Enemies.getAll()) {
       if (e === nearest || e.dead || e.reached) continue;
@@ -97,7 +97,7 @@ const Abilities = (() => {
 
   // Horizontal band (±1 tile) at the clicked y position
   function _effectLineClick(def, px, py) {
-    const bandH = Map.CELL;
+    const bandH = GameMap.CELL;
     for (const e of Enemies.getAll()) {
       if (e.dead || e.reached) continue;
       const pos = e.getPosition();

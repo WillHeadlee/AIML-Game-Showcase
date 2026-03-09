@@ -104,12 +104,15 @@ const TownBuildingsPanel = (() => {
     }
   }
 
-  // Show/hide rows based on current era
+  // Show/hide rows based on current era, and refresh affordability
   function _refreshVisibility() {
     const era = state.currentEra;
     for (const b of ALL_BUILDINGS) {
       if (rowEls[b.id]) {
         rowEls[b.id].row.style.display = b.era <= era ? '' : 'none';
+        if (rowEls[b.id].buyBtn) {
+          rowEls[b.id].buyBtn.disabled = !Resources.canAfford({ gold: b.goldCost });
+        }
       }
     }
   }
@@ -117,6 +120,8 @@ const TownBuildingsPanel = (() => {
   function toggle() {
     if (panelEl) {
       if (panelEl.style.display === 'none') {
+        UI.closeAll();
+        HousingPanel.close();
         _refreshVisibility();
         panelEl.style.display = '';
       } else {
@@ -240,11 +245,20 @@ const HousingPanel = (() => {
     for (const h of ALL_HOUSING) {
       if (rowEls[h.id]) rowEls[h.id].row.style.display = h.era <= era ? '' : 'none';
     }
+    for (const h of ALL_HOUSING) {
+      if (rowEls[h.id]?.buyBtn) {
+        const hDef = People.ERA_HOUSING[h.era];
+        const cost = { gold: hDef.goldCost, ...hDef.costs };
+        rowEls[h.id].buyBtn.disabled = !Resources.canAfford(cost);
+      }
+    }
   }
 
   function toggle() {
     if (panelEl) {
       if (panelEl.style.display === 'none') {
+        UI.closeAll();
+        TownBuildingsPanel.close();
         _refreshVisibility();
         panelEl.style.display = '';
       } else {

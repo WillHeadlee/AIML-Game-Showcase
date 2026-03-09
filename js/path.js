@@ -138,7 +138,7 @@ const Path = (() => {
   // Marks all defense-zone grid cells whose center is within 2 tiles (80px)
   // of the spline center line as state='path'.  Called once on init.
   function markPathCells() {
-    const HALF_WIDTH = Map.CELL * 2.5; // 50px — extends path zone one extra row below center
+    const HALF_WIDTH = GameMap.CELL * 2.5; // 50px — extends path zone one extra row below center
 
     // Pre-sample path points densely
     const pts = [];
@@ -146,14 +146,14 @@ const Path = (() => {
       pts.push(getPositionAtDistance(d));
     }
 
-    for (let gy = 0; gy < Map.ROWS; gy++) {
-      for (let gx = 0; gx < Map.WALL_COL; gx++) {
-        const cx = Map.CELL / 2 + gx * Map.CELL;  // cell center x
-        const cy = Map.CELL / 2 + gy * Map.CELL;  // cell center y
+    for (let gy = 0; gy < GameMap.ROWS; gy++) {
+      for (let gx = 0; gx < GameMap.WALL_COL; gx++) {
+        const cx = GameMap.CELL / 2 + gx * GameMap.CELL;  // cell center x
+        const cy = GameMap.CELL / 2 + gy * GameMap.CELL;  // cell center y
         for (const pt of pts) {
           const dx = cx - pt.x, dy = cy - pt.y;
           if (dx * dx + dy * dy <= HALF_WIDTH * HALF_WIDTH) {
-            Map.setCell(gx, gy, 'path');
+            GameMap.setCell(gx, gy, 'path');
             break;
           }
         }

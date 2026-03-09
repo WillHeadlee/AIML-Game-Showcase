@@ -48,13 +48,13 @@ const Towers = (() => {
       this.gy             = gy;
       this.damage         = def.damage;
       this.attackSpeed    = def.attackSpeed;
-      this.rangePx        = def.rangeTiles * Map.CELL;
+      this.rangePx        = def.rangeTiles * GameMap.CELL;
       this.aoe            = def.aoe;
       this.spriteKey      = def.spriteKey;
       this.label          = def.label;
       this.peopleRequired = def.peopleRequired ?? 1;
 
-      const center = Map.gridToPixel(gx, gy);
+      const center = GameMap.gridToPixel(gx, gy);
       this.cx = center.x;
       this.cy = center.y;
 
@@ -73,9 +73,13 @@ const Towers = (() => {
     // Supply multiplier: Era 1-2 = full power, Era 3+ = supply-health based
     _supplyMult() {
       if (DEFS[this.type].era < 3) return { dmgMult: 1.0, speedPenalty: 0, dormant: false };
-      const conn = Supply.getConnection(this.id);
-      const h    = conn ? conn.supplyHealth : 0;
-      return Supply.getSupplyMultiplier(h);
+      try {
+        const conn = Supply.getConnection(this.id);
+        const h    = conn ? conn.supplyHealth : 0;
+        return Supply.getSupplyMultiplier(h);
+      } catch (_e) {
+        return { dmgMult: 1.0, speedPenalty: 0, dormant: false };
+      }
     }
 
     update(dt, enemies) {
@@ -166,9 +170,9 @@ const Towers = (() => {
 
   // ----- Placement validation -----
   function isValid(gx, gy) {
-    const cell = Map.getCell(gx, gy);
+    const cell = GameMap.getCell(gx, gy);
     if (!cell) return false;
-    if (!Map.isDefenseZone(gx)) return false;
+    if (!GameMap.isDefenseZone(gx)) return false;
     return cell.state === 'open';
   }
 
@@ -178,7 +182,7 @@ const Towers = (() => {
     if (!Resources.canAfford(cost)) return 'insufficient';
     Resources.spendResources(cost);
     towers.push(new Tower(type, gx, gy));
-    Map.setCell(gx, gy, 'tower');
+    GameMap.setCell(gx, gy, 'tower');
     return 'ok';
   }
 
@@ -188,9 +192,9 @@ const Towers = (() => {
   function demolish(tower) {
     const count = People.getAssigned(tower.id);
     for (let i = 0; i < count; i++) People.removeFromTower(tower.id);
-    Supply.disconnect(tower.id);
+    if (typeof Supply !== 'undefined') Supply.disconnect(tower.id);
     towers = towers.filter(t => t !== tower);
-    Map.setCell(tower.gx, tower.gy, 'open');
+    GameMap.setCell(tower.gx, tower.gy, 'open');
   }
 
   function clear() { towers = []; }
