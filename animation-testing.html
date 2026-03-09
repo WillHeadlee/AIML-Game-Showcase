@@ -1405,7 +1405,7 @@
   let vmbReady  = 0;
   for (let i = 1; i <= VMB_TOTAL; i++) {
     const img = new Image();
-    img.src = `assets/Vombie/vombie-attacking/${String(i).padStart(4,'0')}.jpg`;
+    img.src = `assets/Vombie/vombie-attacking-png/${String(i).padStart(4,'0')}.png`;
     img.onload = () => { if (++vmbReady === VMB_TOTAL) requestAnimationFrame(vmbLoop); };
     vmbImgs.push(img);
   }
@@ -1477,7 +1477,7 @@
   let nzReady  = 0;
   for (let i = 1; i <= NZ_TOTAL; i++) {
     const img = new Image();
-    img.src = `assets/Necro Zombie/necro-zombie-attacking/${String(i).padStart(4,'0')}.jpg`;
+    img.src = `assets/Necro Zombie/necro-zombie-attacking-png/${String(i).padStart(4,'0')}.png`;
     img.onload = () => { if (++nzReady === NZ_TOTAL) requestAnimationFrame(nzLoop); };
     nzImgs.push(img);
   }
@@ -1549,7 +1549,7 @@
   let gzReady  = 0;
   for (let i = 1; i <= GZ_TOTAL; i++) {
     const img = new Image();
-    img.src = `assets/Grunt Zombie/grunt-zombie-attacking/${String(i).padStart(4,'0')}.jpg`;
+    img.src = `assets/Grunt Zombie/grunt-zombie-attacking-png/${String(i).padStart(4,'0')}.png`;
     img.onload = () => { if (++gzReady === GZ_TOTAL) requestAnimationFrame(gzLoop); };
     gzImgs.push(img);
   }

@@ -148,6 +148,28 @@ const Assets = (() => {
       },
     },
 
+    // ── Era II — Zombie Enemies ──────────────────────────────────────────────
+    gruntZombie: {
+      era: 2, role: 'enemy',
+      anims: {
+        walk: { type:'frames', dir:'assets/Grunt Zombie/grunt-zombie-attacking-png', count:66, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    necroZombie: {
+      era: 2, role: 'enemy',
+      anims: {
+        walk: { type:'frames', dir:'assets/Necro Zombie/necro-zombie-attacking-png', count:162, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
+      },
+    },
+
+    vombie: {
+      era: 2, role: 'enemy',
+      anims: {
+        walk: { type:'frames', dir:'assets/Vombie/vombie-attacking-png', count:161, pad:4, prefix:'', ext:'png', fps:24, fw:1280, fh:720 },
+      },
+    },
+
     // Era IV & V use placeholder rendering (no sprite assets yet)
   };
 
