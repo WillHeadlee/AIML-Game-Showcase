@@ -290,6 +290,17 @@
   border: 1px solid rgba(200, 80, 80, 0.55);
 }
 
+.popup-btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.popup-btn-row .popup-btn-done,
+.popup-btn-row .popup-btn-accept {
+  flex: 1;
+}
+
 .popup-btn-done {
   display: block;
   width: 100%;

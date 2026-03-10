@@ -59,6 +59,10 @@ function init() {
       Abilities.reset();
       Barricades.setEra(state.currentEra);
 
+      // Refresh panels so new era's buildings/housing become visible
+      TownBuildingsPanel.refresh();
+      HousingPanel.refresh();
+
       // Load new era assets then show advancement overlay
       Assets.loadEra(state.currentEra).then(() => {
         EraAdvancementOverlay.show(state.currentEra, () => {
@@ -95,6 +99,8 @@ function init() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       UI.closeAll();
+      UI.clearSelection();
+      SupplyOverlay.close();
     }
   });
 
@@ -163,6 +169,8 @@ function _devSwitchEra(era) {
   Abilities.reset();
   Barricades.setEra(era);
   Resources.devFill();
+  TownBuildingsPanel.refresh();
+  HousingPanel.refresh();
   Assets.loadEra(era).then(() => { UI.update(state); });
   UI.update(state);
 }

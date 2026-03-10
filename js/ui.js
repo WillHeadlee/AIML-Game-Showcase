@@ -605,8 +605,8 @@ const UI = (() => {
       return;
     }
 
-    // Build mode placement (only on empty cells)
-    if (buildMode && state.phase !== 'gameover') {
+    // Build mode placement (only on empty cells, only if something is selected)
+    if (buildMode && selectedType !== null && state.phase !== 'gameover') {
       let result;
       if (selectedType === 'barricade') {
         result = Barricades.place(gx, gy);
@@ -1005,5 +1005,10 @@ const UI = (() => {
     _closeBarricadePanel();
   }
 
-  return { init, renderHUD, renderStartWaveButton, update, enableStartButton, getBuildState, closeAll, adoptPanels };
+  function clearSelection() {
+    selectedType = null;
+    hoverCell    = null;
+  }
+
+  return { init, renderHUD, renderStartWaveButton, update, enableStartButton, getBuildState, closeAll, clearSelection, adoptPanels };
 })();

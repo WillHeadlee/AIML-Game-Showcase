@@ -292,7 +292,7 @@ const Renderer = (() => {
   // ----- Build highlight -----
   function drawBuildHighlight() {
     const { buildMode, hoverCell, selectedType } = UI.getBuildState();
-    if (!buildMode || !hoverCell) return;
+    if (!buildMode || !hoverCell || !selectedType) return;
 
     const { gx, gy } = hoverCell;
     const valid = selectedType === 'barricade'
