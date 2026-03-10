@@ -341,5 +341,5 @@ const Renderer = (() => {
     }
   }
 
-  return { init, drawZones, drawPath, drawGrid, drawBarricades, drawTowers, drawBuildHighlight, drawEnemies, drawWall, drawSprite, drawSettlementBuildings };
+  return { init, drawZones, drawPath, drawGrid, drawBarricades, drawTowers, drawBuildHighlight, drawEnemies, drawWall, drawSprite, drawSettlementBuildings, BUILDING_DEFS, BUILDING_SIZE };
 })();

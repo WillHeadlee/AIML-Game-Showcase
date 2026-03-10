@@ -164,7 +164,14 @@ const TownBuildingsPanel = (() => {
 
   function getLevel(id) { return levels[id] ?? 0; }
 
-  return { init, toggle, close, refresh, getLevel };
+  function getBuildingInfo(id) { return ALL_BUILDINGS.find(b => b.id === id) ?? null; }
+
+  function upgrade(id) {
+    const b = ALL_BUILDINGS.find(b => b.id === id);
+    if (b) _onUpgrade(b);
+  }
+
+  return { init, toggle, close, refresh, getLevel, getBuildingInfo, upgrade };
 })();
 
 // ----- Housing Panel -----

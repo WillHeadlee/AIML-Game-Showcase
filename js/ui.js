@@ -30,6 +30,10 @@ const UI = (() => {
   let abilityFillEl = null;
   let abilityTargeting = false;
 
+  let sidebarOpen      = true;
+  let buildingPopupEl  = null;
+  let buildingPopupId  = null;
+
   let buildMode    = true;  // always on (build mode button silenced)
   let selectedType = 'club';
   let hoverCell    = null;
@@ -159,6 +163,13 @@ const UI = (() => {
 
     sidebar.appendChild(contentArea);
     hud.appendChild(sidebar);
+
+    // ── SIDEBAR TOGGLE TAB ──
+    const sidebarToggle = document.createElement('button');
+    sidebarToggle.id = 'sidebar-toggle-btn';
+    sidebarToggle.textContent = '❯';
+    sidebarToggle.addEventListener('click', (e) => { e.stopPropagation(); _toggleSidebar(); });
+    hud.appendChild(sidebarToggle);
 
     // ── RESOURCES PANEL (left of sidebar) ──
     resourcesPanelEl = document.createElement('div');
@@ -586,6 +597,31 @@ const UI = (() => {
       return;
     }
 
+    // Close sidebar on any canvas click
+    if (sidebarOpen) _closeSidebar();
+
+    // Check if clicking on a settlement building (right of wall)
+    if (cx >= GameMap.WALL_COL * GameMap.CELL) {
+      const bSize = Renderer.BUILDING_SIZE;
+      for (const def of Renderer.BUILDING_DEFS) {
+        if (TownBuildingsPanel.getLevel(def.id) === 0) continue; // only rendered buildings
+        if (cx >= def.x && cx <= def.x + bSize && cy >= def.y && cy <= def.y + bSize) {
+          if (buildingPopupId === def.id) {
+            _closeBuildingPopup();
+          } else {
+            _openBuildingPopup(def);
+          }
+          return;
+        }
+      }
+      // Clicked blank settlement area — close building popup
+      _closeBuildingPopup();
+      return;
+    }
+
+    // Defense zone clicks — close building popup
+    _closeBuildingPopup();
+
     const gx = Math.floor(cx / GameMap.CELL);
     const gy = Math.floor((cy + 5) / GameMap.CELL);
 
@@ -668,6 +704,130 @@ const UI = (() => {
   function getBuildState() { return { buildMode, hoverCell, selectedType }; }
 
   // ----- Internal helpers -----
+
+  // ----- Sidebar collapse -----
+  function _toggleSidebar() { sidebarOpen ? _closeSidebar() : _openSidebar(); }
+
+  function _openSidebar() {
+    sidebarOpen = true;
+    document.getElementById('hud-build-sidebar')?.classList.remove('collapsed');
+    document.getElementById('hud-resources-panel')?.classList.remove('sidebar-collapsed');
+    if (startWaveBtn) startWaveBtn.classList.remove('sidebar-collapsed');
+    const tb = document.getElementById('sidebar-toggle-btn');
+    if (tb) { tb.classList.remove('collapsed'); tb.textContent = '❯'; }
+  }
+
+  function _closeSidebar() {
+    sidebarOpen = false;
+    document.getElementById('hud-build-sidebar')?.classList.add('collapsed');
+    document.getElementById('hud-resources-panel')?.classList.add('sidebar-collapsed');
+    if (startWaveBtn) startWaveBtn.classList.add('sidebar-collapsed');
+    const tb = document.getElementById('sidebar-toggle-btn');
+    if (tb) { tb.classList.add('collapsed'); tb.textContent = '❮'; }
+  }
+
+  // ----- Building popup -----
+  function _closeBuildingPopup() {
+    if (buildingPopupEl) { buildingPopupEl.remove(); buildingPopupEl = null; }
+    buildingPopupId = null;
+  }
+
+  function _openBuildingPopup(def) {
+    _closeBuildingPopup();
+    buildingPopupId = def.id;
+    const info = TownBuildingsPanel.getBuildingInfo(def.id);
+    if (!info) return;
+
+    const MAX    = 3;
+    const lv     = TownBuildingsPanel.getLevel(def.id);
+    const bSize  = Renderer.BUILDING_SIZE;
+
+    // Position: centered below building, flip above if near bottom
+    let popX = def.x + bSize / 2 - 140;
+    let popY = def.y + bSize + 10;
+    if (popY + 230 > 1060) popY = def.y - 230 - 10;
+    // Keep within horizontal bounds (don't overlap sidebar or go off left)
+    popX = Math.max(10, Math.min(1920 - 420 - 290, popX));
+
+    buildingPopupEl = document.createElement('div');
+    buildingPopupEl.id = 'building-popup';
+    buildingPopupEl.style.left = `${popX}px`;
+    buildingPopupEl.style.top  = `${popY}px`;
+    buildingPopupEl.addEventListener('click', (e) => e.stopPropagation());
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'bpop-header';
+    const nameBlock = document.createElement('div');
+    const nameEl = document.createElement('div');
+    nameEl.className = 'bpop-name';
+    nameEl.textContent = info.name;
+    const eraEl = document.createElement('div');
+    eraEl.className = 'bpop-era';
+    eraEl.textContent = `Era ${info.era}  ·  ${ERA_NAMES[info.era] ?? ''}`;
+    nameBlock.appendChild(nameEl);
+    nameBlock.appendChild(eraEl);
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'bpop-close';
+    closeBtn.textContent = '×';
+    closeBtn.addEventListener('click', (e) => { e.stopPropagation(); _closeBuildingPopup(); });
+    header.appendChild(nameBlock);
+    header.appendChild(closeBtn);
+    buildingPopupEl.appendChild(header);
+
+    // Level pips
+    const levelRow = document.createElement('div');
+    levelRow.className = 'bpop-level';
+    const pipsEl = document.createElement('span');
+    pipsEl.className = 'bpop-pips';
+    pipsEl.textContent = Array.from({ length: MAX }, (_, i) => i < lv ? '●' : '○').join('');
+    const lvText = document.createElement('span');
+    lvText.className = 'bpop-level-text';
+    lvText.textContent = lv === 0 ? 'Unbuilt' : lv >= MAX ? 'MAX' : `Level ${lv}`;
+    levelRow.appendChild(pipsEl);
+    levelRow.appendChild(lvText);
+    buildingPopupEl.appendChild(levelRow);
+
+    // Production
+    const prodEl = document.createElement('div');
+    prodEl.className = 'bpop-prod';
+    if (lv > 0) {
+      prodEl.innerHTML = `Producing <span>+${(info.rate * lv).toFixed(1)} ${info.produces}/s</span>`;
+    } else {
+      prodEl.textContent = `Produces ${info.produces}`;
+    }
+    buildingPopupEl.appendChild(prodEl);
+
+    // Cost + action button
+    if (lv < MAX) {
+      const nextCost  = info.goldCost * (lv + 1);
+      const canAfford = Resources.canAfford({ gold: nextCost });
+
+      const costEl = document.createElement('div');
+      costEl.className = 'bpop-cost';
+      costEl.textContent = `Cost: ${nextCost}g`;
+      buildingPopupEl.appendChild(costEl);
+
+      const actionBtn = document.createElement('button');
+      actionBtn.className = 'bpop-action-btn';
+      actionBtn.textContent = lv === 0 ? 'Build' : 'Upgrade';
+      actionBtn.disabled = !canAfford;
+      actionBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        TownBuildingsPanel.upgrade(info.id);
+        _openBuildingPopup(def); // Rebuild popup with new state
+      });
+      buildingPopupEl.appendChild(actionBtn);
+    } else {
+      const actionBtn = document.createElement('button');
+      actionBtn.className = 'bpop-action-btn';
+      actionBtn.textContent = 'Maxed';
+      actionBtn.disabled = true;
+      buildingPopupEl.appendChild(actionBtn);
+    }
+
+    document.getElementById('hud').appendChild(buildingPopupEl);
+  }
 
   function _refreshBuildModeBtn() {
     if (!buildModeBtn) return;
@@ -1005,6 +1165,8 @@ const UI = (() => {
   function closeAll() {
     _closeTowerPanel();
     _closeBarricadePanel();
+    _closeBuildingPopup();
+    _closeSidebar();
   }
 
   function clearSelection() {
