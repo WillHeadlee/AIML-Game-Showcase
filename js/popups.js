@@ -49,12 +49,23 @@ const PeopleArrivalPopup = (() => {
     doneBtn.disabled = true;
     doneBtn.addEventListener('click', _onDone);
 
+    const acceptAllBtn = document.createElement('button');
+    acceptAllBtn.className = 'popup-btn popup-btn-accept';
+    acceptAllBtn.textContent = 'Accept All';
+    acceptAllBtn.addEventListener('click', () => {
+      for (const row of listEl.querySelectorAll('.popup-person-row')) {
+        const btn = row.querySelector('.popup-btn-accept');
+        if (btn && !btn.disabled) btn.click();
+      }
+      _onDone();
+    });
+
     let pendingCount = arrivalCount;
 
     function onRowResolved() {
       pendingCount--;
       _refreshHousingInfo(housingInfo);
-      _refreshAcceptButtons(listEl);
+      _refreshAcceptButtons(listEl, acceptAllBtn);
       if (pendingCount === 0 || !People.canAccept()) doneBtn.disabled = false;
     }
 
@@ -100,10 +111,15 @@ const PeopleArrivalPopup = (() => {
     }
 
     popupEl.appendChild(listEl);
-    popupEl.appendChild(doneBtn);
+
+    const btnRow = document.createElement('div');
+    btnRow.className = 'popup-btn-row';
+    btnRow.append(acceptAllBtn, doneBtn);
+    popupEl.appendChild(btnRow);
+
     document.getElementById('hud').appendChild(popupEl);
 
-    _refreshAcceptButtons(listEl);
+    _refreshAcceptButtons(listEl, acceptAllBtn);
     if (!People.canAccept()) doneBtn.disabled = false;
   }
 
@@ -115,7 +131,7 @@ const PeopleArrivalPopup = (() => {
       `Housing: ${used} / ${cap}  \u00b7  ${avail} slot${avail === 1 ? '' : 's'} available`;
   }
 
-  function _refreshAcceptButtons(listEl) {
+  function _refreshAcceptButtons(listEl, acceptAllBtn) {
     const canStill = People.canAccept();
     for (const row of listEl.querySelectorAll('.popup-person-row')) {
       const btn = row.querySelector('.popup-btn-accept');
@@ -123,6 +139,10 @@ const PeopleArrivalPopup = (() => {
         btn.disabled = !canStill;
         btn.title    = canStill ? '' : 'Build more housing';
       }
+    }
+    if (acceptAllBtn) {
+      acceptAllBtn.disabled = !canStill;
+      acceptAllBtn.title    = canStill ? '' : 'Build more housing';
     }
   }
 

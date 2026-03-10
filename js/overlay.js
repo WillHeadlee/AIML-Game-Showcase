@@ -160,7 +160,9 @@ const TownBuildingsPanel = (() => {
 
   function close() { if (panelEl) panelEl.style.display = 'none'; }
 
-  return { init, toggle, close };
+  function refresh() { _refreshVisibility(); }
+
+  return { init, toggle, close, refresh };
 })();
 
 // ----- Housing Panel -----
@@ -297,7 +299,9 @@ const HousingPanel = (() => {
 
   function close() { if (panelEl) panelEl.style.display = 'none'; }
 
-  return { init, toggle, close };
+  function refresh() { _refreshVisibility(); }
+
+  return { init, toggle, close, refresh };
 })();
 
 // ----- Supply Overlay -----
