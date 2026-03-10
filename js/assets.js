@@ -11,7 +11,8 @@ const Assets = (() => {
       era: 1, role: 'enemy',
       sfx: 'boar',
       anims: {
-        walk: { type:'frames', dir:'assets/Boar/boar-walking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        walk:   { type:'frames', dir:'assets/Boar/boar-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Boar/boar-attacking-png', count:109, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
       },
     },
 
@@ -19,7 +20,8 @@ const Assets = (() => {
       era: 1, role: 'enemy',
       sfx: 'mammoth',
       anims: {
-        walk: { type:'frames', dir:'assets/Mammoth/mammoth-walking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        walk:   { type:'frames', dir:'assets/Mammoth/mammoth-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Mammoth/mammoth-attacking-png', count:129, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
       },
     },
 
@@ -27,7 +29,8 @@ const Assets = (() => {
       era: 1, role: 'enemy',
       sfx: 'tiger',
       anims: {
-        walk: { type:'frames', dir:'assets/Saber Tooth Tiger/saber-tooth-tiger-walking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        walk:   { type:'frames', dir:'assets/Saber Tooth Tiger/saber-tooth-tiger-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Saber Tooth Tiger/saber-tooth-tiger-attacking-png', count:171, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
       },
     },
 
@@ -69,21 +72,24 @@ const Assets = (() => {
     witch: {
       era: 2, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Witch/witch-walking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        walk:   { type:'frames', dir:'assets/Witch/witch-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Witch/witch-attacking-png', count:145, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
       },
     },
 
     vampire: {
       era: 2, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Vampire/vampire-walking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        walk:   { type:'frames', dir:'assets/Vampire/vampire-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Vampire/vampire-attacking-png', count:109, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
       },
     },
 
     ghost: {
       era: 2, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Ghost/ghost-walking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        walk:   { type:'frames', dir:'assets/Ghost/ghost-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Ghost/ghost-attacking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
       },
     },
 
@@ -115,21 +121,24 @@ const Assets = (() => {
     pirateSword: {
       era: 3, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Sword Pirate/sword-pirate-walking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        walk:   { type:'frames', dir:'assets/Sword Pirate/sword-pirate-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Sword Pirate/sword-pirate-attacking-png', count:114, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
       },
     },
 
     pirateRifle: {
       era: 3, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Flintlock Pirate/flintlock-pirate-walking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        walk:   { type:'frames', dir:'assets/Flintlock Pirate/flintlock-pirate-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Flintlock Pirate/flintlock-pirate-attacking-png', count:146, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
       },
     },
 
     pirateBomb: {
       era: 3, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Bomb Pirate/bomb-pirate-walking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        walk:   { type:'frames', dir:'assets/Bomb Pirate/bomb-pirate-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Bomb Pirate/bomb-pirate-attacking-png', count:164, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
       },
     },
 
@@ -152,21 +161,24 @@ const Assets = (() => {
     gruntZombie: {
       era: 2, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Grunt Zombie/grunt-zombie-walking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        walk:   { type:'frames', dir:'assets/Grunt Zombie/grunt-zombie-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Grunt Zombie/grunt-zombie-attacking-png', count: 66, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
       },
     },
 
     necroZombie: {
       era: 2, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Necro Zombie/necro-zombie-walking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        walk:   { type:'frames', dir:'assets/Necro Zombie/necro-zombie-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Necro Zombie/necro-zombie-attacking-png', count:162, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
       },
     },
 
     vombie: {
       era: 2, role: 'enemy',
       anims: {
-        walk: { type:'frames', dir:'assets/Vombie/vombie-walking-png', count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        walk:   { type:'frames', dir:'assets/Vombie/vombie-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Vombie/vombie-attacking-png', count:161, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
       },
     },
 

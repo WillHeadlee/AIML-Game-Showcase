@@ -67,8 +67,13 @@ const Enemies = (() => {
       this.frameElapsed = 0;
 
       // State flags
-      this.dead    = false;
-      this.reached = false;  // reached town end (despawn silently)
+      this.dead     = false;
+      this.reached  = false;  // reached town end
+      this.attacking = false; // reached gate, playing attack animation
+      this.breached  = false; // finished attacking, ready to remove
+      this.attacksLeft    = 3;   // deal damage this many times at the gate
+      this.attackTimer    = 0;   // countdown to next attack (seconds)
+      this.attackInterval = 1.5; // seconds between gate attacks
 
       // Health bar visibility timer (seconds remaining)
       this.damageTimer = 0;
@@ -105,9 +110,11 @@ const Enemies = (() => {
       return Path.getTangentAtDistance(this.distance);
     }
 
-    // Step animation frame forward.
+    // Step animation frame forward (walk or attack based on state).
     updateAnimation(dt) {
-      const animEntry = Assets.getAnim(this.spriteKey, 'walk');
+      const animKey  = this.attacking ? 'attack' : 'walk';
+      const animEntry = Assets.getAnim(this.spriteKey, animKey)
+                     ?? Assets.getAnim(this.spriteKey, 'walk');
       if (!animEntry) return;
       const frameDur = 1000 / animEntry.meta.fps;
       this.frameElapsed += dt;
@@ -140,13 +147,33 @@ const Enemies = (() => {
   function update(dt) {
     for (let i = enemies.length - 1; i >= 0; i--) {
       const e = enemies[i];
-      e.updatePosition(dt);
+
+      if (!e.attacking) {
+        e.updatePosition(dt);
+      }
       e.updateAnimation(dt);
       e.updateDamageTimer(dt);
-      if (e.reached) {
-        Town.takeDamage(e.townDamage);
-        enemies.splice(i, 1);
-      } else if (e.dead) {
+
+      // Transition: reached gate → start attacking
+      if (!e.attacking && e.reached) {
+        e.attacking   = true;
+        e.frameIndex  = 0;
+        e.frameElapsed = 0;
+        e.attackTimer = 0; // fire first hit immediately
+      }
+
+      // Gate attack: deal periodic damage then breach
+      if (e.attacking && !e.breached) {
+        e.attackTimer -= dt / 1000;
+        if (e.attackTimer <= 0) {
+          e.attackTimer = e.attackInterval;
+          Town.takeDamage(Math.ceil(e.townDamage / 3));
+          e.attacksLeft--;
+          if (e.attacksLeft <= 0) e.breached = true;
+        }
+      }
+
+      if (e.dead || e.breached) {
         enemies.splice(i, 1);
       }
     }
