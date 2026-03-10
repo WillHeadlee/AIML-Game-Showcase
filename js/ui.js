@@ -629,6 +629,8 @@ const UI = (() => {
     _updateLowSupplyWarning();
     _updateAbilityButton();
     _updateTowerAffordability();
+    TownBuildingsPanel.refresh();
+    HousingPanel.refresh();
   }
 
   function renderStartWaveButton() {

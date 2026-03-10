@@ -5,10 +5,10 @@
 const People = (() => {
 
   // Starting conditions:
-  // 3 people pre-seeded into unassigned pool, 1 Hut already built (capacity 3).
+  // 4 people pre-seeded into unassigned pool, 1 Hut already built (capacity 4).
   // Capacity matches pool so arrivals can be accepted once wave 1 completes.
-  let totalCapacity  = 3;
-  let unassignedPool = 3;
+  let totalCapacity  = 4;
+  let unassignedPool = 4;
 
   // towerId (string) → count of assigned people
   const assignedMap = {};

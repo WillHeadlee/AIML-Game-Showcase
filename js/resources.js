@@ -9,7 +9,7 @@ const Resources = (() => {
   // All stockpile resource types across all eras.
   // Starting values: bone=15, wood=20 (Era 1 production materials).
   const stockpiles = {
-    bone:      15,
+    bone:      20,
     wood:      20,
     stone:      0,
     iron:       0,

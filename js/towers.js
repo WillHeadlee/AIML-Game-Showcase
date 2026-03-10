@@ -8,29 +8,29 @@ const Towers = (() => {
   // rangeTiles: tower attack range in grid cells (pixels = rangeTiles * GameMap.CELL).
   const DEFS = {
     // Era 1 — Prehistoric
-    club:        { era:1, damage:20, attackSpeed:1.0, rangeTiles: 4, aoe:false, spriteKey:'clubMan',        label:'Club',         cost:{ bone: 5, wood:  3 }, peopleRequired:1 },
-    rockThrower: { era:1, damage:14, attackSpeed:2.2, rangeTiles: 8, aoe:false, spriteKey:'stoneMan',       label:'Rock Thrower', cost:{ bone: 8, wood:  5 }, peopleRequired:1 },
-    spear:       { era:1, damage:30, attackSpeed:2.8, rangeTiles:12, aoe:false, spriteKey:'spearMan',       label:'Spear',        cost:{ bone:10, wood:  8 }, peopleRequired:1 },
+    club:        { era:1, damage:20, attackSpeed:1.0, rangeTiles: 4, aoe:false, spriteKey:'clubMan',        label:'Club',         cost:{ bone:10, wood:  6 }, peopleRequired:1 },
+    rockThrower: { era:1, damage:14, attackSpeed:2.2, rangeTiles: 8, aoe:false, spriteKey:'stoneMan',       label:'Rock Thrower', cost:{ bone:16, wood: 10 }, peopleRequired:1 },
+    spear:       { era:1, damage:30, attackSpeed:2.8, rangeTiles:12, aoe:false, spriteKey:'spearMan',       label:'Spear',        cost:{ bone:20, wood: 16 }, peopleRequired:1 },
 
     // Era 2 — Medieval
-    sword:       { era:2, damage:35, attackSpeed:0.9, rangeTiles: 4, aoe:false, spriteKey:'swordMan',       label:'Sword',        cost:{ stone: 8, iron:  6 }, peopleRequired:1 },
-    cavalry:     { era:2, damage:50, attackSpeed:1.5, rangeTiles: 6, aoe:false, spriteKey:'horseMan',       label:'Cavalry',      cost:{ stone:12, iron:  8 }, peopleRequired:1 },
-    crossbow:    { era:2, damage:22, attackSpeed:1.8, rangeTiles:12, aoe:false, spriteKey:'crossbowMan',    label:'Crossbow',     cost:{ stone:10, iron:  7 }, peopleRequired:1 },
+    sword:       { era:2, damage:35, attackSpeed:0.9, rangeTiles: 4, aoe:false, spriteKey:'swordMan',       label:'Sword',        cost:{ stone:16, iron: 12 }, peopleRequired:1 },
+    cavalry:     { era:2, damage:50, attackSpeed:1.5, rangeTiles: 6, aoe:false, spriteKey:'horseMan',       label:'Cavalry',      cost:{ stone:24, iron: 16 }, peopleRequired:1 },
+    crossbow:    { era:2, damage:22, attackSpeed:1.8, rangeTiles:12, aoe:false, spriteKey:'crossbowMan',    label:'Crossbow',     cost:{ stone:20, iron: 14 }, peopleRequired:1 },
 
     // Era 3 — Pirate Age
-    cutlass:     { era:3, damage:55, attackSpeed:0.8, rangeTiles: 4, aoe:false, spriteKey:'cutlassMan',     label:'Cutlass',      cost:{ timber:10, gunpowder: 6 }, peopleRequired:1 },
-    blunderbuss: { era:3, damage:45, attackSpeed:2.2, rangeTiles:10, aoe:false, spriteKey:'blunderbussMan', label:'Blunderbuss',  cost:{ timber:12, gunpowder: 8 }, peopleRequired:1 },
-    mortar:      { era:3, damage:90, attackSpeed:3.5, rangeTiles:14, aoe:true,  spriteKey:'cutlassMan',     label:'Mortar',       cost:{ timber:18, gunpowder:14 }, peopleRequired:2 },
+    cutlass:     { era:3, damage:55, attackSpeed:0.8, rangeTiles: 4, aoe:false, spriteKey:'cutlassMan',     label:'Cutlass',      cost:{ timber:20, gunpowder:12 }, peopleRequired:1 },
+    blunderbuss: { era:3, damage:45, attackSpeed:2.2, rangeTiles:10, aoe:false, spriteKey:'blunderbussMan', label:'Blunderbuss',  cost:{ timber:24, gunpowder:16 }, peopleRequired:1 },
+    mortar:      { era:3, damage:90, attackSpeed:3.5, rangeTiles:14, aoe:true,  spriteKey:'cutlassMan',     label:'Mortar',       cost:{ timber:36, gunpowder:28 }, peopleRequired:2 },
 
     // Era 4 — World War II
-    rifleman:    { era:4, damage:65, attackSpeed:1.2, rangeTiles:14, aoe:false, spriteKey:'rifleman',       label:'Rifleman',     cost:{ steel:12, oil: 8 }, peopleRequired:1 },
-    machineGun:  { era:4, damage:40, attackSpeed:0.4, rangeTiles:10, aoe:false, spriteKey:'machineGun',     label:'Machine Gun',  cost:{ steel:18, oil:12 }, peopleRequired:2 },
-    artillery:   { era:4, damage:160,attackSpeed:4.0, rangeTiles:18, aoe:true,  spriteKey:'artillery',      label:'Artillery',    cost:{ steel:25, oil:18 }, peopleRequired:2 },
+    rifleman:    { era:4, damage:65, attackSpeed:1.2, rangeTiles:14, aoe:false, spriteKey:'rifleman',       label:'Rifleman',     cost:{ steel:24, oil:16 }, peopleRequired:1 },
+    machineGun:  { era:4, damage:40, attackSpeed:0.4, rangeTiles:10, aoe:false, spriteKey:'machineGun',     label:'Machine Gun',  cost:{ steel:36, oil:24 }, peopleRequired:2 },
+    artillery:   { era:4, damage:160,attackSpeed:4.0, rangeTiles:18, aoe:true,  spriteKey:'artillery',      label:'Artillery',    cost:{ steel:50, oil:36 }, peopleRequired:2 },
 
     // Era 5 — Sci-Fi
-    laserTurret: { era:5, damage:120, attackSpeed:0.5, rangeTiles:16, aoe:false, spriteKey:'laserTurret',  label:'Laser Turret', cost:{ alloy:14, plasma:10 }, peopleRequired:1 },
-    railgun:     { era:5, damage:320, attackSpeed:3.0, rangeTiles:24, aoe:false, spriteKey:'railgun',      label:'Railgun',      cost:{ alloy:20, plasma:15 }, peopleRequired:2 },
-    nukeStation: { era:5, damage:550, attackSpeed:8.0, rangeTiles:20, aoe:true,  spriteKey:'nukeStation',  label:'Nuke Station', cost:{ alloy:30, plasma:22 }, peopleRequired:3 },
+    laserTurret: { era:5, damage:120, attackSpeed:0.5, rangeTiles:16, aoe:false, spriteKey:'laserTurret',  label:'Laser Turret', cost:{ alloy:28, plasma:20 }, peopleRequired:1 },
+    railgun:     { era:5, damage:320, attackSpeed:3.0, rangeTiles:24, aoe:false, spriteKey:'railgun',      label:'Railgun',      cost:{ alloy:40, plasma:30 }, peopleRequired:2 },
+    nukeStation: { era:5, damage:550, attackSpeed:8.0, rangeTiles:20, aoe:true,  spriteKey:'nukeStation',  label:'Nuke Station', cost:{ alloy:60, plasma:44 }, peopleRequired:3 },
   };
 
   let nextTowerId = 0;
@@ -120,21 +120,20 @@ const Towers = (() => {
     }
 
     _fireSingleTarget(enemies, sm) {
-      let nearest     = null;
-      let nearestDist = Infinity;
+      let target       = null;
+      let furthestDist = -1;
       for (const e of enemies) {
         if (e.dead || e.reached) continue;
-        const pos  = e.getPosition();
-        const dx   = pos.x - this.cx;
-        const dy   = pos.y - this.cy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist <= this.rangePx && dist < nearestDist) {
-          nearest     = e;
-          nearestDist = dist;
+        const pos = e.getPosition();
+        const dx  = pos.x - this.cx;
+        const dy  = pos.y - this.cy;
+        if (Math.sqrt(dx * dx + dy * dy) <= this.rangePx && e.distance > furthestDist) {
+          target       = e;
+          furthestDist = e.distance;
         }
       }
-      if (!nearest) { this.attacking = false; return; }
-      nearest.takeDamage(this.damage * this.staffingRatio * sm.dmgMult);
+      if (!target) { this.attacking = false; return; }
+      target.takeDamage(this.damage * this.staffingRatio * sm.dmgMult);
       this._onFire(sm.speedPenalty);
     }
 
