@@ -326,6 +326,7 @@ function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   Renderer.drawZones();
+  Renderer.drawSettlementBuildings();
   Renderer.drawGrid();
   Renderer.drawPath();
   Renderer.drawWall();

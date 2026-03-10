@@ -6,10 +6,51 @@ const Renderer = (() => {
   let ctx;
   let mapBg = null;
 
+  // ----- Settlement building sprites -----
+  // Positions are top-left corners (px). Lower x = drawn on top.
+  // Layout: top row + bottom row border a clear center for Town Hall & Housing.
+  const BUILDING_DEFS = [
+    { id: 'ironMine',        name: 'Iron Mine',         x: 1010, y:  70 },
+    { id: 'stoneQuarry',     name: 'Stone Quarry',      x: 1220, y:  40 },
+    { id: 'timberMill',      name: 'Timber Mill',       x: 1455, y:  50 },
+    { id: 'steelFoundry',    name: 'Steel Foundry',     x: 1665, y:  70 },
+    { id: 'boneYard',        name: 'Bone Yard',         x: 980,  y: 560 },
+    { id: 'plasmaGenerator', name: 'Plasma Generator',  x: 1695, y: 490 },
+    { id: 'lumberCamp',      name: 'Lumber Camp',       x: 1005, y: 835 },
+    { id: 'powderMill',      name: 'Powder Mill',       x: 1215, y: 850 },
+    { id: 'oilRefinery',     name: 'Oil Refinery',      x: 1450, y: 840 },
+    { id: 'alloyForge',      name: 'Alloy Forge',       x: 1660, y: 815 },
+  ];
+  // Pre-sorted: highest x first so lower-x buildings are drawn last (on top)
+  const BUILDING_DEFS_SORTED = [...BUILDING_DEFS].sort((a, b) => b.x - a.x);
+  const BUILDING_SIZE = 190; // display width & height in px
+  const _buildingImgs = {}; // id → [Image lv1, Image lv2, Image lv3]
+
+  function _loadBuildingImages() {
+    for (const def of BUILDING_DEFS) {
+      _buildingImgs[def.id] = [1, 2, 3].map(lv => {
+        const img = new Image();
+        img.src = encodeURI(`assets/Building assets/no_bg/${def.name} Level ${lv}_no_bg.png`);
+        return img;
+      });
+    }
+  }
+
+  function drawSettlementBuildings() {
+    for (const def of BUILDING_DEFS_SORTED) {
+      const lv = TownBuildingsPanel.getLevel(def.id);
+      if (lv === 0) continue;
+      const img = _buildingImgs[def.id]?.[lv - 1];
+      if (!img?.complete || img.naturalWidth === 0) continue;
+      ctx.drawImage(img, def.x, def.y, BUILDING_SIZE, BUILDING_SIZE);
+    }
+  }
+
   function init(context) {
     ctx = context;
     mapBg = new Image();
     mapBg.src = 'assets/Curvy map.jpeg';
+    _loadBuildingImages();
   }
 
   // ----- Era theme helpers -----
@@ -300,5 +341,5 @@ const Renderer = (() => {
     }
   }
 
-  return { init, drawZones, drawPath, drawGrid, drawBarricades, drawTowers, drawBuildHighlight, drawEnemies, drawWall, drawSprite };
+  return { init, drawZones, drawPath, drawGrid, drawBarricades, drawTowers, drawBuildHighlight, drawEnemies, drawWall, drawSprite, drawSettlementBuildings };
 })();

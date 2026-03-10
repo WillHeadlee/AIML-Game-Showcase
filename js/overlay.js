@@ -162,7 +162,9 @@ const TownBuildingsPanel = (() => {
 
   function refresh() { _refreshVisibility(); }
 
-  return { init, toggle, close, refresh };
+  function getLevel(id) { return levels[id] ?? 0; }
+
+  return { init, toggle, close, refresh, getLevel };
 })();
 
 // ----- Housing Panel -----
