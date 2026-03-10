@@ -142,6 +142,7 @@ const Enemies = (() => {
 
   function spawn(type) {
     enemies.push(new Enemy(type));
+    playSound(ENEMY_SFX[type]);
   }
 
   function update(dt) {
