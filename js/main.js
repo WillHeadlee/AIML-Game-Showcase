@@ -160,7 +160,6 @@ function _initDevPanel() {
 function _devSwitchEra(era) {
   if (era < 1 || era > 5) return;
   Enemies.clear();
-  Towers.clear();
   Barricades.clear();
   state.currentEra  = era;
   state.currentWave = 1;
@@ -168,7 +167,6 @@ function _devSwitchEra(era) {
   Town.reset(era);
   Abilities.reset();
   Barricades.setEra(era);
-  Resources.devFill();
   TownBuildingsPanel.refresh();
   HousingPanel.refresh();
   Assets.loadEra(era).then(() => { UI.update(state); });
