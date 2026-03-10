@@ -15,7 +15,7 @@ const SFX_FILES = {
   cavalry:         'assets/sfx/horse.wav',
   boar:            'assets/sfx/boar.ogg',
   saberToothTiger: 'assets/sfx/tiger.ogg',
-  mammoth:         'assets/sfx/mammoth.ogg',
+  mammoth:         'assets/sfx/mammoth.wav',
 };
 
 function initAudio() {
