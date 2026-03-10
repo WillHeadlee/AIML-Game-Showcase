@@ -8,16 +8,16 @@ const TownBuildingsPanel = (() => {
   // All buildings across all eras — each era unlocks its pair on era advancement.
   // Each building has 3 upgrade levels; cost scales per level.
   const ALL_BUILDINGS = [
-    { id: 'boneYard',        era: 1, name: 'Bone Yard',         produces: 'bone',      rate: 2, goldCost:  30 },
-    { id: 'lumberCamp',      era: 1, name: 'Lumber Camp',       produces: 'wood',      rate: 2, goldCost:  30 },
-    { id: 'stoneQuarry',     era: 2, name: 'Stone Quarry',      produces: 'stone',     rate: 2, goldCost:  45 },
-    { id: 'ironMine',        era: 2, name: 'Iron Mine',         produces: 'iron',      rate: 2, goldCost:  45 },
-    { id: 'timberMill',      era: 3, name: 'Timber Mill',       produces: 'timber',    rate: 2, goldCost:  60 },
-    { id: 'powderMill',      era: 3, name: 'Powder Mill',       produces: 'gunpowder', rate: 2, goldCost:  60 },
-    { id: 'steelFoundry',    era: 4, name: 'Steel Foundry',     produces: 'steel',     rate: 2, goldCost:  80 },
-    { id: 'oilRefinery',     era: 4, name: 'Oil Refinery',      produces: 'oil',       rate: 2, goldCost:  80 },
-    { id: 'alloyForge',      era: 5, name: 'Alloy Forge',       produces: 'alloy',     rate: 2, goldCost: 100 },
-    { id: 'plasmaGenerator', era: 5, name: 'Plasma Generator',  produces: 'plasma',    rate: 2, goldCost: 100 },
+    { id: 'boneYard',        era: 1, name: 'Bone Yard',         produces: 'bone',      rate: 1.5, goldCost:  30 },
+    { id: 'lumberCamp',      era: 1, name: 'Lumber Camp',       produces: 'wood',      rate: 1.5, goldCost:  30 },
+    { id: 'stoneQuarry',     era: 2, name: 'Stone Quarry',      produces: 'stone',     rate: 1.5, goldCost:  45 },
+    { id: 'ironMine',        era: 2, name: 'Iron Mine',         produces: 'iron',      rate: 1.5, goldCost:  45 },
+    { id: 'timberMill',      era: 3, name: 'Timber Mill',       produces: 'timber',    rate: 1.5, goldCost:  60 },
+    { id: 'powderMill',      era: 3, name: 'Powder Mill',       produces: 'gunpowder', rate: 1.5, goldCost:  60 },
+    { id: 'steelFoundry',    era: 4, name: 'Steel Foundry',     produces: 'steel',     rate: 1.5, goldCost:  80 },
+    { id: 'oilRefinery',     era: 4, name: 'Oil Refinery',      produces: 'oil',       rate: 1.5, goldCost:  80 },
+    { id: 'alloyForge',      era: 5, name: 'Alloy Forge',       produces: 'alloy',     rate: 1.5, goldCost: 100 },
+    { id: 'plasmaGenerator', era: 5, name: 'Plasma Generator',  produces: 'plasma',    rate: 1.5, goldCost: 100 },
   ];
 
   const MAX_LEVEL = 3;
