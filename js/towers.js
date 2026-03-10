@@ -158,6 +158,7 @@ const Towers = (() => {
       this.attacking    = true;
       this.frameIndex   = 0;
       this.frameElapsed = 0;
+      playSound(TOWER_SFX[this.type]);
     }
   }
 
