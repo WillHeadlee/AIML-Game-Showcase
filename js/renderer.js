@@ -106,7 +106,9 @@ const Renderer = (() => {
       const tangent = e.getFacing();
       const angle   = Math.atan2(tangent.y, tangent.x);
 
-      const animEntry = Assets.getAnim(e.spriteKey, 'walk');
+      const animKey   = e.attacking ? 'attack' : 'walk';
+      const animEntry = Assets.getAnim(e.spriteKey, animKey)
+                     ?? Assets.getAnim(e.spriteKey, 'walk');
 
       ctx.save();
       ctx.translate(pos.x, pos.y);

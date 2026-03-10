@@ -589,7 +589,23 @@ const UI = (() => {
     const gx = Math.floor(cx / GameMap.CELL);
     const gy = Math.floor((cy + 5) / GameMap.CELL);
 
-    // Build mode placement
+    // Always check existing structures first — lets player open tower/barricade
+    // panels even while build mode is active
+    const tower = Towers.getAt(gx, gy);
+    if (tower) {
+      _closeBarricadePanel();
+      _openTowerPanel(tower);
+      return;
+    }
+
+    const barricade = Barricades.getAt(gx, gy);
+    if (barricade) {
+      _closeTowerPanel();
+      _openBarricadePanel(barricade);
+      return;
+    }
+
+    // Build mode placement (only on empty cells)
     if (buildMode && state.phase !== 'gameover') {
       let result;
       if (selectedType === 'barricade') {
@@ -598,22 +614,6 @@ const UI = (() => {
         result = Towers.place(selectedType, gx, gy);
       }
       if (result === 'insufficient') _flashResourceError();
-      return;
-    }
-
-    // Select tower
-    const tower = Towers.getAt(gx, gy);
-    if (tower) {
-      _closeBarricadePanel();
-      _openTowerPanel(tower);
-      return;
-    }
-
-    // Select barricade
-    const barricade = Barricades.getAt(gx, gy);
-    if (barricade) {
-      _closeTowerPanel();
-      _openBarricadePanel(barricade);
       return;
     }
 
