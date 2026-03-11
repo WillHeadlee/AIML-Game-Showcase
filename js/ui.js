@@ -164,13 +164,6 @@ const UI = (() => {
     sidebar.appendChild(contentArea);
     hud.appendChild(sidebar);
 
-    // ── SIDEBAR TOGGLE TAB ──
-    const sidebarToggle = document.createElement('button');
-    sidebarToggle.id = 'sidebar-toggle-btn';
-    sidebarToggle.textContent = '❯';
-    sidebarToggle.addEventListener('click', (e) => { e.stopPropagation(); _toggleSidebar(); });
-    hud.appendChild(sidebarToggle);
-
     // ── RESOURCES PANEL (left of sidebar) ──
     resourcesPanelEl = document.createElement('div');
     resourcesPanelEl.id = 'hud-resources-panel';
@@ -596,9 +589,6 @@ const UI = (() => {
       Abilities.activate(cx, cy);
       return;
     }
-
-    // Close sidebar on any canvas click
-    if (sidebarOpen) _closeSidebar();
 
     // Check if clicking on a settlement building (right of wall)
     if (cx >= GameMap.WALL_COL * GameMap.CELL) {

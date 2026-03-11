@@ -167,37 +167,7 @@
   pointer-events: auto;
   z-index: 15;
   overflow: hidden;
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
-#hud-build-sidebar.collapsed {
-  transform: translateX(420px);
-}
-
-/* ── SIDEBAR TOGGLE TAB ── */
-#sidebar-toggle-btn {
-  position: absolute;
-  top: 50%;
-  right: 420px;
-  transform: translateY(-50%);
-  width: 26px;
-  height: 68px;
-  background: rgba(8, 4, 1, 0.88);
-  border: 2px solid rgba(180,130,50,0.55);
-  border-right: none;
-  border-radius: 6px 0 0 6px;
-  color: var(--era-text, #D2B48C);
-  font-size: 15px;
-  cursor: pointer;
-  pointer-events: auto;
-  z-index: 16;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: right 0.28s cubic-bezier(0.4, 0, 0.2, 1), background 0.15s;
-  box-shadow: -4px 0 16px rgba(0,0,0,0.6);
-}
-#sidebar-toggle-btn:hover { background: rgba(180,130,50,0.2); }
-#sidebar-toggle-btn.collapsed { right: 0; }
 
 /* Tab bar */
 #sidebar-tabs {
@@ -498,9 +468,7 @@
   padding: 16px 18px 18px;
   pointer-events: none;
   z-index: 14;
-  transition: right 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
-#hud-resources-panel.sidebar-collapsed { right: 0; }
 .res-gold-display {
   display: flex;
   align-items: center;
@@ -690,7 +658,7 @@
   cursor: pointer;
   transition: right 0.28s cubic-bezier(0.4, 0, 0.2, 1), filter 0.12s, box-shadow 0.12s, transform 0.08s;
 }
-#hud-start-wave.sidebar-collapsed { right: 48px; }
+
 #hud-start-wave:hover:not(:disabled) {
   filter: brightness(1.25);
   box-shadow: 0 4px 28px rgba(205,133,63,0.55), inset 0 1px 0 rgba(255,220,140,0.35);

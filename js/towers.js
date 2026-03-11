@@ -50,7 +50,6 @@ const Towers = (() => {
       this.attackSpeed    = def.attackSpeed;
       this.rangePx        = def.rangeTiles * GameMap.CELL;
       this.aoe            = def.aoe;
-      this.spriteKey      = def.spriteKey;
       this.label          = def.label;
       this.peopleRequired = def.peopleRequired ?? 1;
 
@@ -58,11 +57,10 @@ const Towers = (() => {
       this.cx = center.x;
       this.cy = center.y;
 
-      this.frameIndex   = 0;
-      this.frameElapsed = 0;
       this.attacking    = false;
       this.attackTimer  = 0;
       this.attackFlash  = 0;
+      this.faceAngle    = 0; // radians, 0 = right
     }
 
     get staffingRatio() {
@@ -93,22 +91,6 @@ const Towers = (() => {
         this.attackFlash = Math.max(0, this.attackFlash - dt / 1000);
       }
 
-      if (this.attacking) {
-        const animEntry = Assets.getAnim(this.spriteKey, 'attack');
-        if (animEntry) {
-          const frameDur = 1000 / animEntry.meta.fps;
-          this.frameElapsed += dt;
-          while (this.frameElapsed >= frameDur) {
-            this.frameIndex++;
-            this.frameElapsed -= frameDur;
-          }
-          const frameCount = animEntry.meta.type === 'sheet'
-            ? animEntry.meta.frames
-            : (animEntry.images?.length ?? 1);
-          this.frameIndex %= frameCount;
-        }
-      }
-
       this.attackTimer -= dt / 1000;
       if (this.attackTimer > 0) return;
 
@@ -135,6 +117,7 @@ const Towers = (() => {
       if (!target) { this.attacking = false; return; }
       target.takeDamage(this.damage * this.staffingRatio * sm.dmgMult);
       const tpos = target.getPosition();
+      this.faceAngle = Math.atan2(tpos.y - this.cy, tpos.x - this.cx);
       Projectiles.fire(this.type, this.cx, this.cy - 5, tpos.x, tpos.y);
       this._onFire(sm.speedPenalty);
     }
@@ -154,7 +137,10 @@ const Towers = (() => {
         }
       }
       if (hit) {
-        if (firstPos) Projectiles.fire(this.type, this.cx, this.cy - 5, firstPos.x, firstPos.y);
+        if (firstPos) {
+          this.faceAngle = Math.atan2(firstPos.y - this.cy, firstPos.x - this.cx);
+          Projectiles.fire(this.type, this.cx, this.cy - 5, firstPos.x, firstPos.y);
+        }
         this._onFire(sm.speedPenalty);
       } else {
         this.attacking = false;
@@ -163,10 +149,8 @@ const Towers = (() => {
 
     _onFire(speedPenalty = 0) {
       this.attackTimer  = this.attackSpeed + speedPenalty;
-      this.attackFlash  = 0.15;
+      this.attackFlash  = this.type === 'club' ? 0.45 : 0.15;
       this.attacking    = true;
-      this.frameIndex   = 0;
-      this.frameElapsed = 0;
       playSound(TOWER_SFX[this.type]);
     }
   }

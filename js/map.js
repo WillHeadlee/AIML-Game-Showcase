@@ -4,13 +4,13 @@
 
 const GameMap = (() => {
   // ----- Constants -----
-  const COLS = 53;
-  const ROWS = 30;
-  const CELL = 36; // px per cell  (36×30=1080 exact; 53×36=1908 ≈1920)
+  const COLS = 41;
+  const ROWS = 23;
+  const CELL = 47; // px per cell  (47×23=1081 ≈1080; 41×47=1927 ≈1920)
 
-  // Defense zone: cols 0-26  (pixels 0–971)
-  // Settlement zone: cols 27-52 (pixels 972–1907)
-  const WALL_COL = 27;
+  // Defense zone: cols 0-20  (pixels 0–986)
+  // Settlement zone: cols 21-40 (pixels 987–1926)
+  const WALL_COL = 21;
 
   const DEFENSE_ZONE    = { minCol: 0,        maxCol: WALL_COL - 1 };
   const SETTLEMENT_ZONE = { minCol: WALL_COL,  maxCol: COLS - 1 };

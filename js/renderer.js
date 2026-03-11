@@ -10,22 +10,74 @@ const Renderer = (() => {
   // ----- Settlement building sprites -----
   // Positions are top-left corners (px). Lower x = drawn on top.
   // Layout: top row + bottom row border a clear center for Town Hall & Housing.
+  // Settlement zone: x 972–1500 (between wall and sidebar), y 0–1080.
+  // 2 columns × 5 rows, each building 190×190px.
+  // col1=1021, col2=1260  |  rows y=22,212,402,592,782
   const BUILDING_DEFS = [
-    { id: 'ironMine',        name: 'Iron Mine',         x: 1010, y:  70 },
-    { id: 'stoneQuarry',     name: 'Stone Quarry',      x: 1220, y:  40 },
-    { id: 'timberMill',      name: 'Timber Mill',       x: 1455, y:  50 },
-    { id: 'steelFoundry',    name: 'Steel Foundry',     x: 1665, y:  70 },
-    { id: 'boneYard',        name: 'Bone Yard',         x: 980,  y: 560 },
-    { id: 'plasmaGenerator', name: 'Plasma Generator',  x: 1695, y: 490 },
-    { id: 'lumberCamp',      name: 'Lumber Camp',       x: 1005, y: 835 },
-    { id: 'powderMill',      name: 'Powder Mill',       x: 1215, y: 850 },
-    { id: 'oilRefinery',     name: 'Oil Refinery',      x: 1450, y: 840 },
-    { id: 'alloyForge',      name: 'Alloy Forge',       x: 1660, y: 815 },
+    { id: 'boneYard',        name: 'Bone Yard',         x: 1021, y:  22 },
+    { id: 'lumberCamp',      name: 'Lumber Camp',       x: 1260, y:  22 },
+    { id: 'ironMine',        name: 'Iron Mine',         x: 1021, y: 212 },
+    { id: 'stoneQuarry',     name: 'Stone Quarry',      x: 1260, y: 212 },
+    { id: 'timberMill',      name: 'Timber Mill',       x: 1021, y: 402 },
+    { id: 'powderMill',      name: 'Powder Mill',       x: 1260, y: 402 },
+    { id: 'steelFoundry',    name: 'Steel Foundry',     x: 1021, y: 592 },
+    { id: 'oilRefinery',     name: 'Oil Refinery',      x: 1260, y: 592 },
+    { id: 'alloyForge',      name: 'Alloy Forge',       x: 1021, y: 782 },
+    { id: 'plasmaGenerator', name: 'Plasma Generator',  x: 1260, y: 782 },
   ];
   // Pre-sorted: highest x first so lower-x buildings are drawn last (on top)
   const BUILDING_DEFS_SORTED = [...BUILDING_DEFS].sort((a, b) => b.x - a.x);
   const BUILDING_SIZE = 190; // display width & height in px
   const _buildingImgs = {}; // id → [Image lv1, Image lv2, Image lv3]
+
+  // ----- People (tower unit) sprites -----
+  const PEOPLE_ASSET_NAMES = {
+    club:        'Club',
+    rockThrower: 'Rock Thrower',
+    spear:       'Spear',
+    sword:       'Sword',
+    cavalry:     'Cavalry',
+    crossbow:    'Crossbow',
+    cutlass:     'Cutlass',
+    blunderbuss: 'Blunderbuss',
+    mortar:      'Mortar',
+    rifleman:    'Rifleman',
+    machineGun:  'Machine Gun',
+    artillery:   'Artillery',
+    laserTurret: 'Laser Turret',
+    railgun:     'Railgun',
+    nukeStation: 'Nuke Station',
+  };
+  const _peopleImgs = {}; // type → Image
+
+  function _loadPeopleImages() {
+    for (const [type, name] of Object.entries(PEOPLE_ASSET_NAMES)) {
+      const img = new Image();
+      img.src = encodeURI(`assets/People assets/no_bg/${name}_no_bg.png`);
+      _peopleImgs[type] = img;
+    }
+  }
+
+  const ATTACK_FRAME_FILES = {
+    rockThrower: 'Warrior_throwing_rock_attack_ef54e6f2e4_no_bg.png',
+    spear:       'Warrior_attacking_with_spear_f58d0b5587_no_bg.png',
+    sword:       'Armored_soldier_attacking_pixel_art_2afc2fb2b7_no_bg.png',
+    cavalry:     'Medieval_soldier_attacking_on_horse_21060bd19b_no_bg.png',
+    crossbow:    'Topdown_pixel_art_sprite_in_stardew_valley_art_sty_26de2dd7bf_no_bg.png',
+    cutlass:     'Pirate_attack_frame_pixel_art_988cca163b_no_bg.png',
+    blunderbuss: 'Pirate_gunner_firing_blunderbuss_0f9565eb15_no_bg.png',
+    mortar:      'Pirate_mortar_crewman_firing_mortar_32dbfa4a04_no_bg.png',
+    rifleman:    'Topdown_pixel_art_sprite_in_stardew_valley_art_sty_48743d9fbd_no_bg.png',
+  };
+  const _attackImgs = {}; // type → Image
+
+  function _loadAttackFrames() {
+    for (const [type, file] of Object.entries(ATTACK_FRAME_FILES)) {
+      const img = new Image();
+      img.src = encodeURI(`assets/Attack frames/no_bg/${file}`);
+      _attackImgs[type] = img;
+    }
+  }
 
   function _loadBuildingImages() {
     for (const def of BUILDING_DEFS) {
@@ -57,6 +109,8 @@ const Renderer = (() => {
       _eraBgs[era] = img;
     }
     _loadBuildingImages();
+    _loadPeopleImages();
+    _loadAttackFrames();
   }
 
   // ----- Era theme helpers -----
@@ -219,37 +273,46 @@ const Renderer = (() => {
       const cy = t.cy - 5;  // align with grid -5px shift
       const r  = GameMap.CELL * 0.44;
 
-      const animEntry = Assets.getAnim(t.spriteKey, 'attack');
+      const rDraw = r * 1.5;
+      const attackImg = _attackImgs[t.type];
+      const useAttackFrame = t.attackFlash > 0 && attackImg?.complete && attackImg.naturalWidth > 0;
+      const displayImg = useAttackFrame ? attackImg : _peopleImgs[t.type];
 
-      if (t.attacking && animEntry) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.clip();
-        drawSprite(animEntry, t.frameIndex, cx - r, cy - r, r * 2, r * 2);
-        ctx.restore();
+      // Club sweep: rotate 90° CCW then return over the attackFlash window
+      let sweepOffset = 0;
+      if (t.type === 'club' && t.attackFlash > 0) {
+        const CLUB_FLASH = 0.45;
+        const p = 1 - t.attackFlash / CLUB_FLASH; // 0 at fire → 1 at end
+        sweepOffset = p < 0.5
+          ? -(p / 0.5) * (Math.PI / 2)         // 0 → -90°
+          : -((1 - p) / 0.5) * (Math.PI / 2);  // -90° → 0°
+      }
 
-        ctx.strokeStyle = 'rgba(255,220,140,0.75)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.stroke();
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate((t.faceAngle ?? 0) + sweepOffset);
+      ctx.beginPath();
+      ctx.arc(0, 0, rDraw, 0, Math.PI * 2);
+      ctx.clip();
+      if (displayImg?.complete && displayImg.naturalWidth > 0) {
+        const drawR = useAttackFrame ? rDraw * 2 : rDraw;
+        ctx.drawImage(displayImg, -drawR, -drawR, drawR * 2, drawR * 2);
       } else {
         ctx.fillStyle = TOWER_COLORS[t.type] ?? '#555';
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
         ctx.fill();
-
-        ctx.strokeStyle = 'rgba(255,220,140,0.75)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
         ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.font = `bold ${GameMap.CELL * 0.38}px monospace`;
+        ctx.font = `bold ${GameMap.CELL * 0.57}px monospace`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(t.label[0], cx, cy);
+        ctx.fillText(t.label[0], 0, 0);
       }
+      ctx.restore();
+
+      ctx.strokeStyle = useAttackFrame ? 'rgba(255,180,60,0.95)' : 'rgba(255,220,140,0.75)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, rDraw, 0, Math.PI * 2);
+      ctx.stroke();
 
       // Dormant overlay
       if (t.staffingRatio === 0) {
