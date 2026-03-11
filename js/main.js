@@ -329,7 +329,6 @@ function render() {
   Renderer.drawSettlementBuildings();
   Renderer.drawGrid();
   Renderer.drawPath();
-  Renderer.drawWall();
   Renderer.drawBarricades();
   Renderer.drawTowers();
   Renderer.drawBuildHighlight();

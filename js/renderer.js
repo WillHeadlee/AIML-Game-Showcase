@@ -5,6 +5,7 @@
 const Renderer = (() => {
   let ctx;
   let mapBg = null;
+  const _eraBgs = {}; // era number → Image
 
   // ----- Settlement building sprites -----
   // Positions are top-left corners (px). Lower x = drawn on top.
@@ -50,6 +51,11 @@ const Renderer = (() => {
     ctx = context;
     mapBg = new Image();
     mapBg.src = 'assets/Curvy map.jpeg';
+    for (let era = 1; era <= 5; era++) {
+      const img = new Image();
+      img.src = encodeURI(`assets/Era ${era}.png`);
+      _eraBgs[era] = img;
+    }
     _loadBuildingImages();
   }
 
@@ -66,8 +72,12 @@ const Renderer = (() => {
 
   // ----- Zone backgrounds -----
   function drawZones() {
-    if (mapBg && mapBg.complete && mapBg.naturalWidth > 0) {
-      ctx.drawImage(mapBg, 0, 0, 1920, 1080);
+    const eraBg = _eraBgs[state.currentEra];
+    const bg = (eraBg?.complete && eraBg.naturalWidth > 0) ? eraBg
+             : (mapBg?.complete && mapBg.naturalWidth > 0) ? mapBg
+             : null;
+    if (bg) {
+      ctx.drawImage(bg, 0, 0, 1920, 1080);
     } else {
       const wallX = GameMap.WALL_COL * GameMap.CELL;
       const theme = _theme();
@@ -341,5 +351,5 @@ const Renderer = (() => {
     }
   }
 
-  return { init, drawZones, drawPath, drawGrid, drawBarricades, drawTowers, drawBuildHighlight, drawEnemies, drawWall, drawSprite, drawSettlementBuildings, BUILDING_DEFS, BUILDING_SIZE };
+  return { init, drawZones, drawPath, drawGrid, drawBarricades, drawTowers, drawBuildHighlight, drawEnemies, drawSprite, drawSettlementBuildings, BUILDING_DEFS, BUILDING_SIZE };
 })();
