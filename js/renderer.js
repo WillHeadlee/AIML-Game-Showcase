@@ -329,6 +329,73 @@ const Renderer = (() => {
     }
   }
 
+  // ----- Projectiles -----
+  function drawProjectiles() {
+    for (const p of Projectiles.getAll()) {
+      const { x, y, ndx, ndy, def } = p;
+      ctx.save();
+
+      if (def.shape === 'beam') {
+        const trailLen = Math.min(p.traveled, def.speed * 0.09);
+        const tx = x - ndx * trailLen;
+        const ty = y - ndy * trailLen;
+        if (def.glow) { ctx.shadowBlur = 14; ctx.shadowColor = def.color; }
+        const grad = ctx.createLinearGradient(tx, ty, x, y);
+        grad.addColorStop(0, 'transparent');
+        grad.addColorStop(1, def.color);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth   = def.r * 2;
+        ctx.lineCap     = 'round';
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle  = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(x, y, def.r * 0.7, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else if (def.shape === 'arrow') {
+        const angle = Math.atan2(ndy, ndx);
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.fillStyle = def.color;
+        ctx.fillRect(-20, -1.5, 20, 3);   // shaft
+        ctx.beginPath();                   // arrowhead
+        ctx.moveTo(4, 0);
+        ctx.lineTo(-6, -4);
+        ctx.lineTo(-6,  4);
+        ctx.closePath();
+        ctx.fill();
+
+      } else {
+        // ball with gradient trail
+        const trailLen = Math.min(p.traveled, def.speed * 0.07);
+        const tx = x - ndx * trailLen;
+        const ty = y - ndy * trailLen;
+        if (def.glow) { ctx.shadowBlur = 18; ctx.shadowColor = def.color; }
+        const grad = ctx.createLinearGradient(tx, ty, x, y);
+        grad.addColorStop(0, 'transparent');
+        grad.addColorStop(1, def.trailColor);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth   = def.r * 1.4;
+        ctx.lineCap     = 'round';
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle  = def.color;
+        ctx.beginPath();
+        ctx.arc(x, y, def.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+  }
+
   // ----- Sprite drawing — returns true if something was drawn -----
   function drawSprite(animEntry, frameIndex, x, y, w, h) {
     if (!animEntry) return false;
@@ -351,5 +418,5 @@ const Renderer = (() => {
     }
   }
 
-  return { init, drawZones, drawPath, drawGrid, drawBarricades, drawTowers, drawBuildHighlight, drawEnemies, drawSprite, drawSettlementBuildings, BUILDING_DEFS, BUILDING_SIZE };
+  return { init, drawZones, drawPath, drawGrid, drawBarricades, drawTowers, drawBuildHighlight, drawEnemies, drawProjectiles, drawSprite, drawSettlementBuildings, BUILDING_DEFS, BUILDING_SIZE };
 })();

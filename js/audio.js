@@ -14,8 +14,8 @@ const SFX_FILES = {
   archer:          'assets/sfx/bow.wav',
   cavalry:         'assets/sfx/horse.wav',
   boar:            'assets/sfx/boar.ogg',
-  saberToothTiger: 'assets/sfx/tiger.ogg',
-  mammoth:         'assets/sfx/mammoth.ogg',
+  saberToothTiger: 'assets/sfx/tiger.wav',
+  mammoth:         'assets/sfx/mammoth.wav',
 };
 
 function initAudio() {
@@ -51,4 +51,35 @@ function playBuffer(buffer) {
   gain.connect(_analyser);
   src.start();
   return buffer.duration;
+}
+
+// Tower type → SFX key
+const TOWER_SFX = {
+  club:        'club',
+  rockThrower: 'rockThrower',
+  spear:       'spear',
+  sword:       'swordsman',
+  cavalry:     'cavalry',
+  crossbow:    'archer',
+};
+
+// Enemy type → SFX key
+const ENEMY_SFX = {
+  boar:       'boar',
+  sabreTooth: 'saberToothTiger',
+  mastodon:   'mammoth',
+};
+
+// Throttle: minimum ms between plays of the same sound
+const _sfxCooldowns = {};
+const SFX_THROTTLE_MS = 120;
+
+function playSound(key) {
+  if (!key || !SFX_FILES[key]) return;
+  const now = performance.now();
+  if (_sfxCooldowns[key] && now - _sfxCooldowns[key] < SFX_THROTTLE_MS) return;
+  _sfxCooldowns[key] = now;
+  initAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  loadSound(key).then(buf => { if (buf) playBuffer(buf); });
 }

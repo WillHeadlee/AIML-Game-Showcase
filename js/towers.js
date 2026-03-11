@@ -13,9 +13,9 @@ const Towers = (() => {
     spear:       { era:1, damage:30, attackSpeed:2.8, rangeTiles:12, aoe:false, spriteKey:'spearMan',       label:'Spear',        cost:{ bone:20, wood: 16 }, peopleRequired:1 },
 
     // Era 2 — Medieval
-    sword:       { era:2, damage:35, attackSpeed:0.9, rangeTiles: 4, aoe:false, spriteKey:'swordMan',       label:'Sword',        cost:{ stone:16, iron: 12 }, peopleRequired:1 },
-    cavalry:     { era:2, damage:50, attackSpeed:1.5, rangeTiles: 6, aoe:false, spriteKey:'horseMan',       label:'Cavalry',      cost:{ stone:24, iron: 16 }, peopleRequired:1 },
-    crossbow:    { era:2, damage:22, attackSpeed:1.8, rangeTiles:12, aoe:false, spriteKey:'crossbowMan',    label:'Crossbow',     cost:{ stone:20, iron: 14 }, peopleRequired:1 },
+    sword:       { era:2, damage:35, attackSpeed:0.9, rangeTiles: 4, aoe:false, spriteKey:'swordMan',       label:'Sword',        cost:{ stone:24, iron: 18 }, peopleRequired:1 },
+    cavalry:     { era:2, damage:50, attackSpeed:1.5, rangeTiles: 6, aoe:false, spriteKey:'horseMan',       label:'Cavalry',      cost:{ stone:36, iron: 24 }, peopleRequired:1 },
+    crossbow:    { era:2, damage:22, attackSpeed:1.8, rangeTiles:12, aoe:false, spriteKey:'crossbowMan',    label:'Crossbow',     cost:{ stone:30, iron: 21 }, peopleRequired:1 },
 
     // Era 3 — Pirate Age
     cutlass:     { era:3, damage:55, attackSpeed:0.8, rangeTiles: 4, aoe:false, spriteKey:'cutlassMan',     label:'Cutlass',      cost:{ timber:20, gunpowder:12 }, peopleRequired:1 },
@@ -134,11 +134,14 @@ const Towers = (() => {
       }
       if (!target) { this.attacking = false; return; }
       target.takeDamage(this.damage * this.staffingRatio * sm.dmgMult);
+      const tpos = target.getPosition();
+      Projectiles.fire(this.type, this.cx, this.cy - 5, tpos.x, tpos.y);
       this._onFire(sm.speedPenalty);
     }
 
     _fireAoE(enemies, sm) {
-      let hit = false;
+      let hit      = false;
+      let firstPos = null;
       for (const e of enemies) {
         if (e.dead || e.reached) continue;
         const pos = e.getPosition();
@@ -146,10 +149,16 @@ const Towers = (() => {
         const dy  = pos.y - this.cy;
         if (Math.sqrt(dx * dx + dy * dy) <= this.rangePx) {
           e.takeDamage(this.damage * this.staffingRatio * sm.dmgMult);
+          if (!firstPos) firstPos = pos;
           hit = true;
         }
       }
-      if (hit) { this._onFire(sm.speedPenalty); } else { this.attacking = false; }
+      if (hit) {
+        if (firstPos) Projectiles.fire(this.type, this.cx, this.cy - 5, firstPos.x, firstPos.y);
+        this._onFire(sm.speedPenalty);
+      } else {
+        this.attacking = false;
+      }
     }
 
     _onFire(speedPenalty = 0) {
@@ -158,6 +167,7 @@ const Towers = (() => {
       this.attacking    = true;
       this.frameIndex   = 0;
       this.frameElapsed = 0;
+      playSound(TOWER_SFX[this.type]);
     }
   }
 

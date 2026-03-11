@@ -160,15 +160,14 @@ function _initDevPanel() {
 function _devSwitchEra(era) {
   if (era < 1 || era > 5) return;
   Enemies.clear();
-  Towers.clear();
   Barricades.clear();
+  Projectiles.clear();
   state.currentEra  = era;
   state.currentWave = 1;
   state.phase       = 'prep';
   Town.reset(era);
   Abilities.reset();
   Barricades.setEra(era);
-  Resources.devFill();
   TownBuildingsPanel.refresh();
   HousingPanel.refresh();
   Assets.loadEra(era).then(() => { UI.update(state); });
@@ -317,6 +316,7 @@ function update(delta) {
   Enemies.update(delta);
   Barricades.update(delta);
   Towers.update(delta);
+  Projectiles.update(delta);
   if (typeof Supply !== 'undefined') Supply.update(delta);
   Abilities.update(delta);
 }
@@ -333,6 +333,7 @@ function render() {
   Renderer.drawTowers();
   Renderer.drawBuildHighlight();
   Renderer.drawEnemies();
+  Renderer.drawProjectiles();
 
   UI.renderHUD();
 }
