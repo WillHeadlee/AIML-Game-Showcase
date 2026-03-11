@@ -67,11 +67,9 @@ const Enemies = (() => {
       this.frameElapsed = 0;
 
       // State flags
-      this.dead     = false;
-      this.reached  = false;  // reached town end
-      this.attacking = false; // reached gate, playing attack animation
-      this.breached  = false; // finished attacking, ready to remove
-      this.attacksLeft    = 3;   // deal damage this many times at the gate
+      this.dead      = false;
+      this.reached   = false;  // reached town end
+      this.attacking = false;  // reached gate, playing attack animation
       this.attackTimer    = 0;   // countdown to next attack (seconds)
       this.attackInterval = 1.5; // seconds between gate attacks
 
@@ -141,6 +139,8 @@ const Enemies = (() => {
   // ----- Public API -----
 
   function spawn(type) {
+    const def = DEFS[type];
+    if (def) Assets.load(def.spriteKey);
     enemies.push(new Enemy(type));
     playSound(ENEMY_SFX[type]);
   }
@@ -163,18 +163,16 @@ const Enemies = (() => {
         e.attackTimer = 0; // fire first hit immediately
       }
 
-      // Gate attack: deal periodic damage then breach
-      if (e.attacking && !e.breached) {
+      // Gate attack: deal periodic damage until killed
+      if (e.attacking) {
         e.attackTimer -= dt / 1000;
         if (e.attackTimer <= 0) {
           e.attackTimer = e.attackInterval;
           Town.takeDamage(Math.ceil(e.townDamage / 3));
-          e.attacksLeft--;
-          if (e.attacksLeft <= 0) e.breached = true;
         }
       }
 
-      if (e.dead || e.breached) {
+      if (e.dead) {
         enemies.splice(i, 1);
       }
     }
