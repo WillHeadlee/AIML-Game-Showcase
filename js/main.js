@@ -50,7 +50,7 @@ function init() {
         // Win condition
         state.phase = 'gameover';
         UI.update(state);
-        setTimeout(() => { window.location.href = 'game.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
         return;
       }
 
@@ -89,7 +89,7 @@ function init() {
   Events.on('game:over', () => {
     state.phase = 'gameover';
     UI.update(state);
-    setTimeout(() => { window.location.href = 'game.html'; }, 1500);
+    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
   });
 
   // Start game immediately; load sprites in background (circle fallback renders until ready)
