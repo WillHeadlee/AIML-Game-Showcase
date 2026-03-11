@@ -14,7 +14,7 @@ const SFX_FILES = {
   archer:          'assets/sfx/bow.wav',
   cavalry:         'assets/sfx/horse.wav',
   boar:            'assets/sfx/boar.ogg',
-  saberToothTiger: 'assets/sfx/tiger.ogg',
+  saberToothTiger: 'assets/sfx/tiger.wav',
   mammoth:         'assets/sfx/mammoth.wav',
 };
 
