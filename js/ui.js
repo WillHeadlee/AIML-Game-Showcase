@@ -559,6 +559,7 @@ const UI = (() => {
       canvasEl.style.cursor = 'crosshair';
     } else {
       Abilities.activate();
+      AbilityEffects.spawn(state.currentEra);
     }
   }
 
@@ -594,6 +595,7 @@ const UI = (() => {
       abilityTargeting = false;
       canvasEl.style.cursor = '';
       Abilities.activate(cx, cy);
+      AbilityEffects.spawn(state.currentEra, cx, cy);
       return;
     }
 
