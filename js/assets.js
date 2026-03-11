@@ -157,9 +157,9 @@ const Assets = (() => {
       },
     },
 
-    // ── Era II — Zombie Enemies ──────────────────────────────────────────────
+    // ── Era IV — Zombie Enemies ──────────────────────────────────────────────
     gruntZombie: {
-      era: 2, role: 'enemy',
+      era: 4, role: 'enemy',
       anims: {
         walk:   { type:'frames', dir:'assets/Grunt Zombie/grunt-zombie-walking-png',   count:140, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
         attack: { type:'frames', dir:'assets/Grunt Zombie/grunt-zombie-attacking-png', count: 66, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
@@ -167,7 +167,7 @@ const Assets = (() => {
     },
 
     necroZombie: {
-      era: 2, role: 'enemy',
+      era: 4, role: 'enemy',
       anims: {
         walk:   { type:'frames', dir:'assets/Necro Zombie/necro-zombie-walking-png',   count:110, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
         attack: { type:'frames', dir:'assets/Necro Zombie/necro-zombie-attacking-png', count:162, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
@@ -175,7 +175,7 @@ const Assets = (() => {
     },
 
     vombie: {
-      era: 2, role: 'enemy',
+      era: 4, role: 'enemy',
       anims: {
         walk:   { type:'frames', dir:'assets/Vombie/vombie-walking-png',   count:105, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
         attack: { type:'frames', dir:'assets/Vombie/vombie-attacking-png', count:161, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
@@ -183,6 +183,14 @@ const Assets = (() => {
     },
 
     // ── Era V — Enemies ──────────────────────────────────────────────────
+    laserAlien: {
+      era: 5, role: 'enemy',
+      anims: {
+        walk:   { type:'frames', dir:'assets/Laser Alien/laser-alien-walking-png',   count:192, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+        attack: { type:'frames', dir:'assets/Laser Alien/laser-alien-attacking-png', count:124, pad:4, prefix:'', ext:'png', fps:20, fw:1280, fh:720 },
+      },
+    },
+
     mechAlien: {
       era: 5, role: 'enemy',
       anims: {

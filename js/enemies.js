@@ -30,8 +30,8 @@ const Enemies = (() => {
 
     // Era 5 — Sci-Fi
     laserAlien:   { era:5, health:1120, speedTiles:2.8, townDamage: 70, spriteKey:'laserAlien',       drawW: 124, drawH: 70,  goldRange:[8,12]  },
-    fortniteBart: { era:5, health:1400, speedTiles:1.8, townDamage:100, spriteKey:'fortniteBart',     drawW: 124, drawH: 70,  goldRange:[18,22] },
-    flyingSaucer: { era:5, health: 880, speedTiles:4.0, townDamage: 55, spriteKey:'flyingSaucer',     drawW: 124, drawH: 70,  goldRange:[8,12]  },
+    fortniteBart: { era:5, health:1400, speedTiles:1.8, townDamage:100, spriteKey:'mechAlien',        drawW: 124, drawH: 70,  goldRange:[18,22] },
+    flyingSaucer: { era:5, health: 880, speedTiles:4.0, townDamage: 55, spriteKey:'saucerAlien',      drawW: 124, drawH: 70,  goldRange:[8,12]  },
   };
 
   // Active enemy list
