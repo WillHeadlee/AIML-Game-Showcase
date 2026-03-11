@@ -105,7 +105,7 @@ const Towers = (() => {
       let target       = null;
       let furthestDist = -1;
       for (const e of enemies) {
-        if (e.dead || e.reached) continue;
+        if (e.dead) continue;
         const pos = e.getPosition();
         const dx  = pos.x - this.cx;
         const dy  = pos.y - this.cy;
@@ -126,7 +126,7 @@ const Towers = (() => {
       let hit      = false;
       let firstPos = null;
       for (const e of enemies) {
-        if (e.dead || e.reached) continue;
+        if (e.dead) continue;
         const pos = e.getPosition();
         const dx  = pos.x - this.cx;
         const dy  = pos.y - this.cy;

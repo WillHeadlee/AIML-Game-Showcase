@@ -9,29 +9,29 @@ const Enemies = (() => {
   // goldRange: [min, max] reward on kill (used in Step 9)
   const DEFS = {
     // Era 1 — Prehistoric
-    boar:         { era:1, health: 100, speedTiles:2.8, townDamage: 15, spriteKey:'boar',           drawW: 70,  drawH: 70,  goldRange:[8,12]  },
-    sabreTooth:   { era:1, health: 160, speedTiles:4.0, townDamage: 25, spriteKey:'saberToothTiger', drawW: 96,  drawH: 54,  goldRange:[8,12]  },
-    mastodon:     { era:1, health: 560, speedTiles:1.0, townDamage: 80, spriteKey:'mammoth',          drawW: 158, drawH: 93,  goldRange:[18,22] },
+    boar:         { era:1, health: 100, speedTiles:2.8, townDamage: 15, spriteKey:'boar',           drawW: 124, drawH: 70,  goldRange:[8,12]  },
+    sabreTooth:   { era:1, health: 160, speedTiles:4.0, townDamage: 25, spriteKey:'saberToothTiger', drawW: 124, drawH: 70,  goldRange:[8,12]  },
+    mastodon:     { era:1, health: 560, speedTiles:1.0, townDamage: 80, spriteKey:'mammoth',          drawW: 124, drawH: 70,  goldRange:[18,22] },
 
     // Era 2 — Medieval
-    witch:        { era:2, health: 360, speedTiles:1.8, townDamage: 20, spriteKey:'witch',            drawW: 70,  drawH: 70,  goldRange:[8,12]  },
-    vampire:      { era:2, health: 520, speedTiles:2.8, townDamage: 35, spriteKey:'vampire',          drawW: 70,  drawH: 70,  goldRange:[8,12]  },
-    ghost:        { era:2, health: 640, speedTiles:1.0, townDamage: 50, spriteKey:'ghost',            drawW: 70,  drawH: 70,  goldRange:[18,22] },
+    witch:        { era:2, health: 360, speedTiles:1.8, townDamage: 20, spriteKey:'witch',            drawW: 124, drawH: 70,  goldRange:[8,12]  },
+    vampire:      { era:2, health: 520, speedTiles:2.8, townDamage: 35, spriteKey:'vampire',          drawW: 124, drawH: 70,  goldRange:[8,12]  },
+    ghost:        { era:2, health: 640, speedTiles:1.0, townDamage: 50, spriteKey:'ghost',            drawW: 124, drawH: 70,  goldRange:[18,22] },
 
     // Era 3 — Pirate
-    pirateSword:  { era:3, health:1050, speedTiles:1.8, townDamage: 40, spriteKey:'pirateSword',      drawW: 70,  drawH: 70,  goldRange:[8,12]  },
-    pirateRifle:  { era:3, health: 750, speedTiles:1.0, townDamage: 30, spriteKey:'pirateRifle',      drawW: 70,  drawH: 70,  goldRange:[8,12]  },
-    pirateBomb:   { era:3, health:1350, speedTiles:1.8, townDamage: 70, spriteKey:'pirateBomb',       drawW: 70,  drawH: 70,  goldRange:[18,22] },
+    pirateSword:  { era:3, health:1050, speedTiles:1.8, townDamage: 40, spriteKey:'pirateSword',      drawW: 124, drawH: 70,  goldRange:[8,12]  },
+    pirateRifle:  { era:3, health: 750, speedTiles:1.0, townDamage: 30, spriteKey:'pirateRifle',      drawW: 124, drawH: 70,  goldRange:[8,12]  },
+    pirateBomb:   { era:3, health:1350, speedTiles:1.8, townDamage: 70, spriteKey:'pirateBomb',       drawW: 124, drawH: 70,  goldRange:[18,22] },
 
     // Era 4 — WW2 Zombies
-    gruntZombie:  { era:4, health: 720, speedTiles:1.8, townDamage: 45, spriteKey:'gruntZombie',      drawW: 70,  drawH: 70,  goldRange:[8,12]  },
-    vombie:       { era:4, health: 880, speedTiles:1.0, townDamage: 65, spriteKey:'vombie',           drawW: 70,  drawH: 70,  goldRange:[18,22] },
-    necroZombie:  { era:4, health:1200, speedTiles:1.0, townDamage: 90, spriteKey:'necroZombie',      drawW: 70,  drawH: 70,  goldRange:[18,22] },
+    gruntZombie:  { era:4, health: 720, speedTiles:1.8, townDamage: 45, spriteKey:'gruntZombie',      drawW: 124, drawH: 70,  goldRange:[8,12]  },
+    vombie:       { era:4, health: 880, speedTiles:1.0, townDamage: 65, spriteKey:'vombie',           drawW: 124, drawH: 70,  goldRange:[18,22] },
+    necroZombie:  { era:4, health:1200, speedTiles:1.0, townDamage: 90, spriteKey:'necroZombie',      drawW: 124, drawH: 70,  goldRange:[18,22] },
 
     // Era 5 — Sci-Fi
-    laserAlien:   { era:5, health:1120, speedTiles:2.8, townDamage: 70, spriteKey:'laserAlien',       drawW: 70,  drawH: 70,  goldRange:[8,12]  },
-    fortniteBart: { era:5, health:1400, speedTiles:1.8, townDamage:100, spriteKey:'fortniteBart',     drawW: 70,  drawH: 70,  goldRange:[18,22] },
-    flyingSaucer: { era:5, health: 880, speedTiles:4.0, townDamage: 55, spriteKey:'flyingSaucer',     drawW: 70,  drawH: 70,  goldRange:[8,12]  },
+    laserAlien:   { era:5, health:1120, speedTiles:2.8, townDamage: 70, spriteKey:'laserAlien',       drawW: 124, drawH: 70,  goldRange:[8,12]  },
+    fortniteBart: { era:5, health:1400, speedTiles:1.8, townDamage:100, spriteKey:'mechAlien',        drawW: 124, drawH: 70,  goldRange:[18,22] },
+    flyingSaucer: { era:5, health: 880, speedTiles:4.0, townDamage: 55, spriteKey:'saucerAlien',      drawW: 124, drawH: 70,  goldRange:[8,12]  },
   };
 
   // Active enemy list
@@ -67,11 +67,9 @@ const Enemies = (() => {
       this.frameElapsed = 0;
 
       // State flags
-      this.dead     = false;
-      this.reached  = false;  // reached town end
-      this.attacking = false; // reached gate, playing attack animation
-      this.breached  = false; // finished attacking, ready to remove
-      this.attacksLeft    = 3;   // deal damage this many times at the gate
+      this.dead      = false;
+      this.reached   = false;  // reached town end
+      this.attacking = false;  // reached gate, playing attack animation
       this.attackTimer    = 0;   // countdown to next attack (seconds)
       this.attackInterval = 1.5; // seconds between gate attacks
 
@@ -141,6 +139,8 @@ const Enemies = (() => {
   // ----- Public API -----
 
   function spawn(type) {
+    const def = DEFS[type];
+    if (def) Assets.load(def.spriteKey);
     enemies.push(new Enemy(type));
     playSound(ENEMY_SFX[type]);
   }
@@ -163,18 +163,16 @@ const Enemies = (() => {
         e.attackTimer = 0; // fire first hit immediately
       }
 
-      // Gate attack: deal periodic damage then breach
-      if (e.attacking && !e.breached) {
+      // Gate attack: deal periodic damage until killed
+      if (e.attacking) {
         e.attackTimer -= dt / 1000;
         if (e.attackTimer <= 0) {
           e.attackTimer = e.attackInterval;
           Town.takeDamage(Math.ceil(e.townDamage / 3));
-          e.attacksLeft--;
-          if (e.attacksLeft <= 0) e.breached = true;
         }
       }
 
-      if (e.dead || e.breached) {
+      if (e.dead) {
         enemies.splice(i, 1);
       }
     }

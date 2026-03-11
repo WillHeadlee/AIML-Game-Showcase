@@ -32,6 +32,7 @@ function init() {
   window.addEventListener('resize', scaleGame);
 
   Renderer.init(ctx);
+  AbilityEffects.init();
   Town.init(state.currentEra);
   UI.init();
   TownBuildingsPanel.init();
@@ -49,7 +50,7 @@ function init() {
         // Win condition
         state.phase = 'gameover';
         UI.update(state);
-        setTimeout(() => { window.location.href = 'game.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
         return;
       }
 
@@ -88,13 +89,13 @@ function init() {
   Events.on('game:over', () => {
     state.phase = 'gameover';
     UI.update(state);
-    setTimeout(() => { window.location.href = 'game.html'; }, 1500);
+    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
   });
 
-  // Start game immediately; load sprites in background (circle fallback renders until ready)
+  // Preload all eras in background so dev-tool era skipping never shows circles
   assetsReady = true;
   UI.enableStartButton();
-  Assets.loadEra(1);
+  for (let era = 1; era <= 5; era++) Assets.loadEra(era);
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
@@ -319,6 +320,7 @@ function update(delta) {
   Projectiles.update(delta);
   if (typeof Supply !== 'undefined') Supply.update(delta);
   Abilities.update(delta);
+  AbilityEffects.update(delta);
 }
 
 // ----- Render -----
@@ -334,6 +336,7 @@ function render() {
   Renderer.drawBuildHighlight();
   Renderer.drawEnemies();
   Renderer.drawProjectiles();
+  AbilityEffects.draw(ctx);
 
   UI.renderHUD();
 }

@@ -7,15 +7,29 @@ let _analyser = null;
 const audioBuffers = {};
 
 const SFX_FILES = {
+  // Tower attack sounds
   club:            'assets/sfx/club.wav',
   rockThrower:     'assets/sfx/stone.wav',
   spear:           'assets/sfx/spear.wav',
   swordsman:       'assets/sfx/sword.wav',
   archer:          'assets/sfx/bow.wav',
   cavalry:         'assets/sfx/horse.wav',
+  // Era 1 enemies
   boar:            'assets/sfx/boar.ogg',
   saberToothTiger: 'assets/sfx/tiger.wav',
   mammoth:         'assets/sfx/mammoth.wav',
+  // Era 2 enemies
+  witch:           'assets/sfx/witch.wav',
+  vampire:         'assets/sfx/vampire.wav',
+  ghost:           'assets/sfx/ghost.wav',
+  // Era 3 enemies
+  pirate:          'assets/sfx/gunshot.wav',
+  explosion:       'assets/sfx/explosion.wav',
+  // Era 4 enemies
+  zombie:          'assets/sfx/zombie.wav',
+  // Era 5 enemies
+  alienGun:        'assets/sfx/alien_gun.wav',
+  ufo:             'assets/sfx/ufo.wav',
 };
 
 function initAudio() {
@@ -65,9 +79,26 @@ const TOWER_SFX = {
 
 // Enemy type → SFX key
 const ENEMY_SFX = {
-  boar:       'boar',
-  sabreTooth: 'saberToothTiger',
-  mastodon:   'mammoth',
+  // Era 1
+  boar:         'boar',
+  sabreTooth:   'saberToothTiger',
+  mastodon:     'mammoth',
+  // Era 2
+  witch:        'witch',
+  vampire:      'vampire',
+  ghost:        'ghost',
+  // Era 3
+  pirateSword:  'pirate',
+  pirateRifle:  'pirate',
+  pirateBomb:   'explosion',
+  // Era 4
+  gruntZombie:  'zombie',
+  vombie:       'zombie',
+  necroZombie:  'zombie',
+  // Era 5
+  laserAlien:   'alienGun',
+  fortniteBart: 'alienGun',
+  flyingSaucer: 'ufo',
 };
 
 // Throttle: minimum ms between plays of the same sound
