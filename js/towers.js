@@ -134,11 +134,14 @@ const Towers = (() => {
       }
       if (!target) { this.attacking = false; return; }
       target.takeDamage(this.damage * this.staffingRatio * sm.dmgMult);
+      const tpos = target.getPosition();
+      Projectiles.fire(this.type, this.cx, this.cy - 5, tpos.x, tpos.y);
       this._onFire(sm.speedPenalty);
     }
 
     _fireAoE(enemies, sm) {
-      let hit = false;
+      let hit      = false;
+      let firstPos = null;
       for (const e of enemies) {
         if (e.dead || e.reached) continue;
         const pos = e.getPosition();
@@ -146,10 +149,16 @@ const Towers = (() => {
         const dy  = pos.y - this.cy;
         if (Math.sqrt(dx * dx + dy * dy) <= this.rangePx) {
           e.takeDamage(this.damage * this.staffingRatio * sm.dmgMult);
+          if (!firstPos) firstPos = pos;
           hit = true;
         }
       }
-      if (hit) { this._onFire(sm.speedPenalty); } else { this.attacking = false; }
+      if (hit) {
+        if (firstPos) Projectiles.fire(this.type, this.cx, this.cy - 5, firstPos.x, firstPos.y);
+        this._onFire(sm.speedPenalty);
+      } else {
+        this.attacking = false;
+      }
     }
 
     _onFire(speedPenalty = 0) {
