@@ -92,10 +92,10 @@ function init() {
     setTimeout(() => { window.location.href = 'index.html'; }, 1500);
   });
 
-  // Start game immediately; load sprites in background (circle fallback renders until ready)
+  // Preload all eras in background so dev-tool era skipping never shows circles
   assetsReady = true;
   UI.enableStartButton();
-  Assets.loadEra(1);
+  for (let era = 1; era <= 5; era++) Assets.loadEra(era);
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
